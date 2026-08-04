@@ -11,12 +11,13 @@ export async function crearAlumno(data: {
   tutorName?: string;
   medicalNotes?: string;
   categoryIds: string[];
-}) {
+}): Promise<{ error: string; studentId?: undefined } | { error: null; studentId: string }> {
   const check = await assertAdminAction();
-  if ("error" in check) return check;
+  if ("error" in check) return { error: check.error, studentId: undefined };
 
-  if (!data.fullName.trim()) return { error: "El nombre es obligatorio." };
-  if (!data.emergencyPhone.trim()) return { error: "El teléfono de emergencia es obligatorio." };
+  if (!data.fullName.trim()) return { error: "El nombre es obligatorio.", studentId: undefined };
+  if (!data.emergencyPhone.trim())
+    return { error: "El teléfono de emergencia es obligatorio.", studentId: undefined };
 
   const supabase = createClient();
 
@@ -32,7 +33,7 @@ export async function crearAlumno(data: {
     .select("id")
     .single();
 
-  if (error || !student) return { error: "No se pudo crear el alumno." };
+  if (error || !student) return { error: "No se pudo crear el alumno.", studentId: undefined };
 
   if (data.categoryIds.length > 0) {
     const rows = data.categoryIds.map((categoryId) => ({
@@ -41,7 +42,10 @@ export async function crearAlumno(data: {
     }));
     const { error: enrollError } = await supabase.from("enrollments").insert(rows);
     if (enrollError) {
-      return { error: "El alumno se creó pero no se pudo inscribirlo en las categorías elegidas." };
+      return {
+        error: "El alumno se creó pero no se pudo inscribirlo en las categorías elegidas.",
+        studentId: undefined,
+      };
     }
   }
 
