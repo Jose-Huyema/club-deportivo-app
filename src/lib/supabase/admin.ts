@@ -10,6 +10,8 @@ import { createClient } from "@supabase/supabase-js";
  *   desde un Client Component, evitando que la key termine en el bundle del navegador.
  * - Antes de cualquier operación, quien la llama debe verificar explícitamente
  *   que el usuario actual tiene role = 'admin' (ver ejemplos en admin/usuarios/actions.ts).
+ *
+ * NOTA: sin el genérico <Database> hasta generar los tipos reales.
  */
 export function createAdminClient() {
   return createClient(

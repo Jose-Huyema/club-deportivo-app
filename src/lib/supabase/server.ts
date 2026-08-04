@@ -1,15 +1,17 @@
 import { createServerClient, type CookieOptions } from "@supabase/ssr";
 import { cookies } from "next/headers";
-import type { Database } from "@/types/database.types";
 
 /**
  * Cliente Supabase para Server Components, Server Actions y Route Handlers.
  * Lee/escribe la sesión desde las cookies de la request.
+ *
+ * NOTA: sin el genérico <Database> hasta generar los tipos reales con
+ *   npx supabase gen types typescript --project-id TU_PROJECT_ID > src/types/database.types.ts
  */
 export function createClient() {
   const cookieStore = cookies();
 
-  return createServerClient<Database>(
+  return createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
     {
