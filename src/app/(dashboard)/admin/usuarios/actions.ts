@@ -54,13 +54,29 @@ export async function invitarUsuario(email: string, fullName: string, role: "adm
   if (!fullName.trim()) return { error: "El nombre es obligatorio." };
 
   const admin = createAdminClient();
-  const { error } = await admin.auth.admin.inviteUserByEmail(email.trim(), {
+  const { data, error } = await admin.auth.admin.inviteUserByEmail(email.trim(), {
     data: { full_name: fullName.trim(), role },
   });
 
   if (error) {
-    const yaExiste = error.message.toLowerCase().includes("already");
-    return { error: yaExiste ? "Ese email ya está registrado." : "No se pudo enviar la invitación." };
+    // Log completo en los logs de Vercel (Functions → Logs) para poder
+    // diagnosticar la causa real, que Supabase a veces no expone bien al cliente.
+    console.error("Error al invitar usuario:", {
+      message: error.message,
+      status: (error as any).status,
+      code: (error as any).code,
+      name: error.name,
+      raw: error,
+    });
+
+    const yaExiste = error.message?.toLowerCase().includes("already");
+    const detalle = error.message && error.message !== "{}" ? ` (${error.message})` : "";
+
+    return {
+      error: yaExiste
+        ? "Ese email ya está registrado."
+        : `No se pudo enviar la invitación${detalle}. Revisá los logs de Vercel para más detalle.`,
+    };
   }
 
   revalidatePath("/admin/usuarios");
