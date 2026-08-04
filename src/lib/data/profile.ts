@@ -14,16 +14,16 @@ export type Profile = {
  */
 export async function requireProfile(): Promise<Profile> {
   const supabase = createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
 
-  if (!user) redirect("/login");
+  // auth.getUser() devuelve error "AuthSessionMissingError" cuando no hay
+  // sesión — es un caso normal (no logueado), no una falla real.
+  const { data, error: userError } = await supabase.auth.getUser();
+  if (userError || !data.user) redirect("/login");
 
   const { data: profile, error } = await supabase
     .from("profiles")
     .select("id, email, full_name, role")
-    .eq("id", user.id)
+    .eq("id", data.user.id)
     .single();
 
   if (error || !profile) redirect("/login");
@@ -43,19 +43,17 @@ export async function requireAdmin(): Promise<Profile> {
  */
 export async function assertAdminAction(): Promise<{ userId: string } | { error: string }> {
   const supabase = createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const { data, error: userError } = await supabase.auth.getUser();
 
-  if (!user) return { error: "Sesión expirada. Volvé a iniciar sesión." };
+  if (userError || !data.user) return { error: "Sesión expirada. Volvé a iniciar sesión." };
 
   const { data: profile } = await supabase
     .from("profiles")
     .select("role")
-    .eq("id", user.id)
+    .eq("id", data.user.id)
     .single();
 
   if (profile?.role !== "admin") return { error: "No tenés permisos para esta acción." };
 
-  return { userId: user.id };
+  return { userId: data.user.id };
 }
