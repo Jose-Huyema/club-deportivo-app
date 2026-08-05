@@ -10,6 +10,11 @@ export async function crearAlumno(data: {
   birthDate?: string;
   tutorName?: string;
   medicalNotes?: string;
+  dni?: string;
+  address?: string;
+  heightCm?: string;
+  weightKg?: string;
+  clothingSize?: string;
   categoryIds: string[];
 }): Promise<{ error: string; studentId?: undefined } | { error: null; studentId: string }> {
   const check = await assertAdminAction();
@@ -29,6 +34,11 @@ export async function crearAlumno(data: {
       birth_date: data.birthDate || null,
       tutor_name: data.tutorName?.trim() || null,
       medical_notes: data.medicalNotes?.trim() || null,
+      dni: data.dni?.trim() || null,
+      address: data.address?.trim() || null,
+      height_cm: data.heightCm ? Number(data.heightCm) : null,
+      weight_kg: data.weightKg ? Number(data.weightKg) : null,
+      clothing_size: data.clothingSize?.trim() || null,
     })
     .select("id")
     .single();
