@@ -3,12 +3,18 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import clsx from "clsx";
-import type { NavItem } from "@/lib/nav-items";
+import { CalendarCheck, Users, Package, Shield } from "lucide-react";
+import type { NavItem, NavIconName } from "@/lib/nav-items";
 
-// Este archivo SOLO exporta componentes (y un hook interno). Los datos
-// (NAV_ITEMS, ADMIN_NAV_ITEM) viven en "@/lib/nav-items" a propósito: un
-// Server Component no puede manipular datos planos importados desde un
-// módulo "use client" como si fueran valores normales.
+// Los componentes de ícono (funciones) se resuelven ACÁ ADENTRO, en el
+// archivo cliente. Nunca se reciben como prop desde el servidor: solo
+// llega un string (iconName), que es serializable.
+const ICONS: Record<NavIconName, typeof CalendarCheck> = {
+  asistencia: CalendarCheck,
+  alumnos: Users,
+  inventario: Package,
+  admin: Shield,
+};
 
 function useIsActive() {
   const pathname = usePathname();
@@ -17,7 +23,7 @@ function useIsActive() {
 
 export function DesktopNavLink({ item }: { item: NavItem }) {
   const isActive = useIsActive()(item.href);
-  const Icon = item.icon;
+  const Icon = ICONS[item.iconName];
   return (
     <Link
       href={item.href}
@@ -34,7 +40,7 @@ export function DesktopNavLink({ item }: { item: NavItem }) {
 
 export function MobileNavLink({ item }: { item: NavItem }) {
   const isActive = useIsActive()(item.href);
-  const Icon = item.icon;
+  const Icon = ICONS[item.iconName];
   return (
     <Link
       href={item.href}
