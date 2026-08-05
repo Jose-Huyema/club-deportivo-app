@@ -41,6 +41,24 @@ export default async function AlumnoDetallePage({ params }: { params: { studentI
       </div>
 
       <Card className="mb-4 space-y-2 text-sm">
+        {alumno.dni && (
+          <div className="flex justify-between">
+            <span className="text-slate-500">DNI</span>
+            <span className="font-medium text-slate-900">{alumno.dni}</span>
+          </div>
+        )}
+        {alumno.birth_date && (
+          <div className="flex justify-between">
+            <span className="text-slate-500">Fecha de nacimiento</span>
+            <span className="font-medium text-slate-900">{alumno.birth_date}</span>
+          </div>
+        )}
+        {alumno.address && (
+          <div className="flex justify-between">
+            <span className="text-slate-500">Dirección</span>
+            <span className="font-medium text-slate-900">{alumno.address}</span>
+          </div>
+        )}
         <div className="flex justify-between">
           <span className="text-slate-500">Contacto de emergencia</span>
           <span className="font-medium text-slate-900">{alumno.emergency_phone}</span>
@@ -51,12 +69,6 @@ export default async function AlumnoDetallePage({ params }: { params: { studentI
             <span className="font-medium text-slate-900">{alumno.tutor_name}</span>
           </div>
         )}
-        {alumno.birth_date && (
-          <div className="flex justify-between">
-            <span className="text-slate-500">Fecha de nacimiento</span>
-            <span className="font-medium text-slate-900">{alumno.birth_date}</span>
-          </div>
-        )}
         {alumno.medical_notes && (
           <div className="border-t border-slate-100 pt-2">
             <span className="block text-slate-500">Notas médicas</span>
@@ -64,6 +76,32 @@ export default async function AlumnoDetallePage({ params }: { params: { studentI
           </div>
         )}
       </Card>
+
+      {(alumno.height_cm || alumno.weight_kg || alumno.clothing_size) && (
+        <Card className="mb-4">
+          <p className="mb-2 text-sm font-semibold text-slate-700">Medidas</p>
+          <div className="flex gap-4 text-sm">
+            {alumno.height_cm && (
+              <div>
+                <span className="block text-slate-500">Altura</span>
+                <span className="font-medium text-slate-900">{alumno.height_cm} cm</span>
+              </div>
+            )}
+            {alumno.weight_kg && (
+              <div>
+                <span className="block text-slate-500">Peso</span>
+                <span className="font-medium text-slate-900">{alumno.weight_kg} kg</span>
+              </div>
+            )}
+            {alumno.clothing_size && (
+              <div>
+                <span className="block text-slate-500">Talle</span>
+                <span className="font-medium text-slate-900">{alumno.clothing_size}</span>
+              </div>
+            )}
+          </div>
+        </Card>
+      )}
 
       {esAdmin && categorias.length > 0 && (
         <Card className="mb-4">
