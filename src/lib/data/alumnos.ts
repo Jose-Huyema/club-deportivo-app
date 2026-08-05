@@ -37,6 +37,11 @@ export type AlumnoDetalle = {
   emergency_phone: string;
   medical_notes: string | null;
   is_active: boolean;
+  dni: string | null;
+  address: string | null;
+  height_cm: number | null;
+  weight_kg: number | null;
+  clothing_size: string | null;
   categoria_ids: string[];
   categorias: string[];
   historial: { date: string; category_name: string; status: string }[];
@@ -48,7 +53,7 @@ export async function getAlumnoDetalle(studentId: string): Promise<AlumnoDetalle
   const { data: student, error } = await supabase
     .from("students")
     .select(
-      "id, full_name, birth_date, tutor_name, emergency_phone, medical_notes, is_active, enrollments(category_id, categories(name))"
+      "id, full_name, birth_date, tutor_name, emergency_phone, medical_notes, is_active, dni, address, height_cm, weight_kg, clothing_size, enrollments(category_id, categories(name))"
     )
     .eq("id", studentId)
     .single();
@@ -76,6 +81,11 @@ export async function getAlumnoDetalle(studentId: string): Promise<AlumnoDetalle
     emergency_phone: student.emergency_phone,
     medical_notes: student.medical_notes,
     is_active: student.is_active,
+    dni: student.dni,
+    address: student.address,
+    height_cm: student.height_cm,
+    weight_kg: student.weight_kg,
+    clothing_size: student.clothing_size,
     categoria_ids: (student.enrollments ?? []).map((e: any) => e.category_id).filter(Boolean),
     categorias: (student.enrollments ?? []).map((e: any) => e.categories?.name).filter(Boolean),
     historial,
