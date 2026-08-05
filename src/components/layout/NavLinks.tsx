@@ -3,32 +3,21 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import clsx from "clsx";
+import type { NavItem } from "@/lib/nav-items";
 
-export type NavItem = {
-  href: string;
-  label: string;
-  emoji: string;
-};
+// Este archivo SOLO exporta componentes (y un hook interno). Los datos
+// (NAV_ITEMS, ADMIN_NAV_ITEM) viven en "@/lib/nav-items" a propósito: un
+// Server Component no puede manipular datos planos importados desde un
+// módulo "use client" como si fueran valores normales.
 
-export const NAV_ITEMS: NavItem[] = [
-  { href: "/asistencia", label: "Asistencia", emoji: "📅" },
-  { href: "/alumnos", label: "Alumnos", emoji: "👥" },
-  { href: "/inventario", label: "Inventario", emoji: "📦" },
-];
-
-export const ADMIN_NAV_ITEM: NavItem = {
-  href: "/admin/usuarios",
-  label: "Admin",
-  emoji: "🛡️",
-};
-
-export function useIsActive() {
+function useIsActive() {
   const pathname = usePathname();
   return (href: string) => pathname === href || pathname.startsWith(href + "/");
 }
 
 export function DesktopNavLink({ item }: { item: NavItem }) {
   const isActive = useIsActive()(item.href);
+  const Icon = item.icon;
   return (
     <Link
       href={item.href}
@@ -37,7 +26,7 @@ export function DesktopNavLink({ item }: { item: NavItem }) {
         isActive ? "bg-accent/15 text-accent" : "text-slate-300 hover:bg-white/5 hover:text-white"
       )}
     >
-      <span className="text-base leading-none">{item.emoji}</span>
+      <Icon className="h-5 w-5" />
       {item.label}
     </Link>
   );
@@ -45,6 +34,7 @@ export function DesktopNavLink({ item }: { item: NavItem }) {
 
 export function MobileNavLink({ item }: { item: NavItem }) {
   const isActive = useIsActive()(item.href);
+  const Icon = item.icon;
   return (
     <Link
       href={item.href}
@@ -53,7 +43,7 @@ export function MobileNavLink({ item }: { item: NavItem }) {
         isActive ? "text-accent" : "text-slate-400"
       )}
     >
-      <span className="text-base leading-none">{item.emoji}</span>
+      <Icon className="h-5 w-5" />
       {item.label}
     </Link>
   );
