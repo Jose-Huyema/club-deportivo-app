@@ -1,22 +1,23 @@
-import { CalendarCheck, Users, Package, Shield, type LucideIcon } from "lucide-react";
+export type NavIconName = "asistencia" | "alumnos" | "inventario" | "admin";
 
 export type NavItem = {
   href: string;
   label: string;
-  icon: LucideIcon;
+  iconName: NavIconName;
 };
 
-// Archivo SIN "use client": son datos planos, no componentes. Por eso puede
-// importarse y manipularse directo (spread, map, etc.) desde Server Components
-// como el layout del dashboard.
+// Archivo SIN "use client": son datos planos (strings), no componentes ni
+// funciones, así que un Server Component puede manipularlos (spread, map)
+// sin problema, y también se pueden pasar como prop a un Client Component
+// porque son serializables.
 export const NAV_ITEMS: NavItem[] = [
-  { href: "/asistencia", label: "Asistencia", icon: CalendarCheck },
-  { href: "/alumnos", label: "Alumnos", icon: Users },
-  { href: "/inventario", label: "Inventario", icon: Package },
+  { href: "/asistencia", label: "Asistencia", iconName: "asistencia" },
+  { href: "/alumnos", label: "Alumnos", iconName: "alumnos" },
+  { href: "/inventario", label: "Inventario", iconName: "inventario" },
 ];
 
 export const ADMIN_NAV_ITEM: NavItem = {
   href: "/admin/usuarios",
   label: "Admin",
-  icon: Shield,
+  iconName: "admin",
 };
