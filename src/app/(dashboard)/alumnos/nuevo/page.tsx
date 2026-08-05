@@ -1,12 +1,12 @@
 import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
 import { requireAdmin } from "@/lib/data/profile";
-import { getCategorias } from "@/lib/data/admin";
+import { getCategorias, getDisciplinas } from "@/lib/data/admin";
 import { NuevoAlumnoForm } from "./NuevoAlumnoForm";
 
 export default async function NuevoAlumnoPage() {
   await requireAdmin();
-  const categorias = await getCategorias();
+  const [categorias, disciplinas] = await Promise.all([getCategorias(), getDisciplinas()]);
 
   return (
     <div>
@@ -14,7 +14,7 @@ export default async function NuevoAlumnoPage() {
         <ArrowLeft className="h-4 w-4" /> Volver a alumnos
       </Link>
       <h1 className="mb-5 text-xl font-bold text-primary">Nuevo alumno</h1>
-      <NuevoAlumnoForm categorias={categorias} />
+      <NuevoAlumnoForm categorias={categorias} disciplinas={disciplinas} />
     </div>
   );
 }
