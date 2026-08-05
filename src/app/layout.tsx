@@ -2,13 +2,13 @@ import type { Metadata, Viewport } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Club Deportivo",
+  title: "Club Social y Deportivo Alderetes",
   description: "Gestión de asistencia e inventario del club",
   manifest: "/manifest.json",
   appleWebApp: {
     capable: true,
     statusBarStyle: "default",
-    title: "Club Deportivo",
+    title: "Club Social y Deportivo Alderetes ",
   },
 };
 
