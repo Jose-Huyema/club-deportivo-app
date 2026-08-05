@@ -3,24 +3,23 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import clsx from "clsx";
-import { CalendarCheck, Users, Package, Shield } from "lucide-react";
 
 export type NavItem = {
   href: string;
   label: string;
-  icon: typeof CalendarCheck;
+  emoji: string;
 };
 
 export const NAV_ITEMS: NavItem[] = [
-  { href: "/asistencia", label: "Asistencia", icon: CalendarCheck },
-  { href: "/alumnos", label: "Alumnos", icon: Users },
-  { href: "/inventario", label: "Inventario", icon: Package },
+  { href: "/asistencia", label: "Asistencia", emoji: "📅" },
+  { href: "/alumnos", label: "Alumnos", emoji: "👥" },
+  { href: "/inventario", label: "Inventario", emoji: "📦" },
 ];
 
 export const ADMIN_NAV_ITEM: NavItem = {
   href: "/admin/usuarios",
   label: "Admin",
-  icon: Shield,
+  emoji: "🛡️",
 };
 
 export function useIsActive() {
@@ -30,7 +29,6 @@ export function useIsActive() {
 
 export function DesktopNavLink({ item }: { item: NavItem }) {
   const isActive = useIsActive()(item.href);
-  const Icon = item.icon;
   return (
     <Link
       href={item.href}
@@ -39,7 +37,7 @@ export function DesktopNavLink({ item }: { item: NavItem }) {
         isActive ? "bg-accent/15 text-accent" : "text-slate-300 hover:bg-white/5 hover:text-white"
       )}
     >
-      <Icon className="h-5 w-5" />
+      <span className="text-base leading-none">{item.emoji}</span>
       {item.label}
     </Link>
   );
@@ -47,7 +45,6 @@ export function DesktopNavLink({ item }: { item: NavItem }) {
 
 export function MobileNavLink({ item }: { item: NavItem }) {
   const isActive = useIsActive()(item.href);
-  const Icon = item.icon;
   return (
     <Link
       href={item.href}
@@ -56,7 +53,7 @@ export function MobileNavLink({ item }: { item: NavItem }) {
         isActive ? "text-accent" : "text-slate-400"
       )}
     >
-      <Icon className="h-5 w-5" />
+      <span className="text-base leading-none">{item.emoji}</span>
       {item.label}
     </Link>
   );
