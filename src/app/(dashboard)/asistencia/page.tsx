@@ -4,6 +4,7 @@ import { getCategoriasParaAsistencia } from "@/lib/data/asistencia";
 import { Card } from "@/components/ui/Card";
 import { Badge } from "@/components/ui/Badge";
 import { EmptyState } from "@/components/ui/EmptyState";
+import { ChevronRight } from "lucide-react";
 
 export default async function AsistenciaPage() {
   const profile = await requireProfile();
@@ -39,7 +40,7 @@ export default async function AsistenciaPage() {
                   ) : (
                     <Badge tone="warning">Pendiente</Badge>
                   )}
-                  <span className="text-slate-400">›</span>
+                  <ChevronRight className="h-5 w-5 text-slate-400" />
                 </div>
               </Card>
             </Link>
