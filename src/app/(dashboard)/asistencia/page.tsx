@@ -4,24 +4,10 @@ import { getCategoriasParaAsistencia } from "@/lib/data/asistencia";
 import { Card } from "@/components/ui/Card";
 import { Badge } from "@/components/ui/Badge";
 import { EmptyState } from "@/components/ui/EmptyState";
-import { ChevronRight } from "lucide-react";
 
 export default async function AsistenciaPage() {
-  // ── Versión temporal de diagnóstico ──
-  let profile;
-  try {
-    profile = await requireProfile();
-  } catch (err: any) {
-    return <DebugError etapa="requireProfile()" error={{ message: err?.message, stack: err?.stack }} />;
-  }
-
-  let categorias;
-  try {
-    categorias = await getCategoriasParaAsistencia(profile.id, profile.role);
-  } catch (err: any) {
-    return <DebugError etapa="getCategoriasParaAsistencia()" error={{ message: err?.message, stack: err?.stack }} />;
-  }
-  // ── Fin de la versión temporal ──
+  const profile = await requireProfile();
+  const categorias = await getCategoriasParaAsistencia(profile.id, profile.role);
 
   return (
     <div>
@@ -53,27 +39,13 @@ export default async function AsistenciaPage() {
                   ) : (
                     <Badge tone="warning">Pendiente</Badge>
                   )}
-                  <ChevronRight className="h-5 w-5 text-slate-400" />
+                  <span className="text-slate-400">›</span>
                 </div>
               </Card>
             </Link>
           ))}
         </div>
       )}
-    </div>
-  );
-}
-
-function DebugError({ etapa, error }: { etapa: string; error: unknown }) {
-  return (
-    <div>
-      <h1 className="mb-2 text-lg font-bold text-red-700">Error de diagnóstico</h1>
-      <p className="mb-3 text-sm text-slate-600">
-        Falló en: <strong>{etapa}</strong>
-      </p>
-      <pre className="overflow-auto rounded-lg bg-slate-900 p-4 text-xs text-red-300">
-        {JSON.stringify(error, null, 2)}
-      </pre>
     </div>
   );
 }
