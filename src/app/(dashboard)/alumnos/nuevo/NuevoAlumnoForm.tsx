@@ -5,17 +5,31 @@ import { useRouter } from "next/navigation";
 import clsx from "clsx";
 import { Card } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
-import { Label, Input, Textarea, ErrorText } from "@/components/ui/FormField";
-import type { Categoria } from "@/lib/data/admin";
+import { Label, Input, Select, Textarea, ErrorText } from "@/components/ui/FormField";
+import type { Categoria, Disciplina } from "@/lib/data/admin";
 import { crearAlumno } from "./actions";
 
-export function NuevoAlumnoForm({ categorias }: { categorias: Categoria[] }) {
+const TALLES = ["XS", "S", "M", "L", "XL", "XXL"];
+
+export function NuevoAlumnoForm({
+  categorias,
+  disciplinas,
+}: {
+  categorias: Categoria[];
+  disciplinas: Disciplina[];
+}) {
   const router = useRouter();
   const [fullName, setFullName] = useState("");
   const [emergencyPhone, setEmergencyPhone] = useState("");
   const [birthDate, setBirthDate] = useState("");
   const [tutorName, setTutorName] = useState("");
   const [medicalNotes, setMedicalNotes] = useState("");
+  const [dni, setDni] = useState("");
+  const [address, setAddress] = useState("");
+  const [heightCm, setHeightCm] = useState("");
+  const [weightKg, setWeightKg] = useState("");
+  const [clothingSize, setClothingSize] = useState("");
+  const [disciplineFilter, setDisciplineFilter] = useState("todas");
   const [categoryIds, setCategoryIds] = useState<Set<string>>(new Set());
   const [error, setError] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
@@ -39,6 +53,11 @@ export function NuevoAlumnoForm({ categorias }: { categorias: Categoria[] }) {
         birthDate,
         tutorName,
         medicalNotes,
+        dni,
+        address,
+        heightCm,
+        weightKg,
+        clothingSize,
         categoryIds: Array.from(categoryIds),
       });
 
@@ -52,86 +71,128 @@ export function NuevoAlumnoForm({ categorias }: { categorias: Categoria[] }) {
     });
   }
 
+  const categoriasFiltradas =
+    disciplineFilter === "todas"
+      ? categorias
+      : categorias.filter((c) => c.discipline_id === disciplineFilter);
+
   return (
     <Card>
-      <form onSubmit={handleSubmit} className="space-y-4">
+      <form onSubmit={handleSubmit} className="space-y-5">
         <div>
-          <Label htmlFor="fullName">Nombre completo</Label>
-          <Input
-            id="fullName"
-            value={fullName}
-            onChange={(e) => setFullName(e.target.value)}
-            placeholder="Ej: Juan Pérez"
-            required
-          />
-        </div>
-
-        <div>
-          <Label htmlFor="emergencyPhone">Teléfono de emergencia</Label>
-          <Input
-            id="emergencyPhone"
-            value={emergencyPhone}
-            onChange={(e) => setEmergencyPhone(e.target.value)}
-            placeholder="11-2345-6789"
-            required
-          />
-        </div>
-
-        <div>
-          <Label htmlFor="birthDate">Fecha de nacimiento (opcional)</Label>
-          <Input
-            id="birthDate"
-            type="date"
-            value={birthDate}
-            onChange={(e) => setBirthDate(e.target.value)}
-          />
-        </div>
-
-        <div>
-          <Label htmlFor="tutorName">Tutor/a (opcional)</Label>
-          <Input
-            id="tutorName"
-            value={tutorName}
-            onChange={(e) => setTutorName(e.target.value)}
-            placeholder="Ej: Ana Pérez"
-          />
-        </div>
-
-        <div>
-          <Label htmlFor="medicalNotes">Notas médicas (opcional)</Label>
-          <Textarea
-            id="medicalNotes"
-            value={medicalNotes}
-            onChange={(e) => setMedicalNotes(e.target.value)}
-            placeholder="Alergias, condiciones a tener en cuenta, etc."
-          />
-        </div>
-
-        {categorias.length > 0 && (
-          <div>
-            <Label htmlFor="categorias">Categorías (opcional)</Label>
-            <div className="flex flex-wrap gap-2">
-              {categorias.map((c) => {
-                const activa = categoryIds.has(c.id);
-                return (
-                  <button
-                    key={c.id}
-                    type="button"
-                    onClick={() => toggleCategoria(c.id)}
-                    className={clsx(
-                      "rounded-full border px-3 py-1.5 text-xs font-medium transition-colors",
-                      activa
-                        ? "border-accent bg-accent/15 text-accent"
-                        : "border-slate-300 bg-white text-slate-600 hover:border-slate-400"
-                    )}
-                  >
-                    {c.name}
-                  </button>
-                );
-              })}
+          <p className="mb-3 text-sm font-semibold text-slate-700">Datos personales</p>
+          <div className="space-y-3">
+            <div>
+              <Label htmlFor="fullName">Nombre completo</Label>
+              <Input id="fullName" value={fullName} onChange={(e) => setFullName(e.target.value)} placeholder="Ej: Juan Pérez" required />
+            </div>
+            <div className="grid grid-cols-2 gap-3">
+              <div>
+                <Label htmlFor="dni">DNI (opcional)</Label>
+                <Input id="dni" value={dni} onChange={(e) => setDni(e.target.value)} placeholder="12345678" />
+              </div>
+              <div>
+                <Label htmlFor="birthDate">Fecha de nacimiento</Label>
+                <Input id="birthDate" type="date" value={birthDate} onChange={(e) => setBirthDate(e.target.value)} />
+              </div>
+            </div>
+            <div>
+              <Label htmlFor="address">Dirección (opcional)</Label>
+              <Input id="address" value={address} onChange={(e) => setAddress(e.target.value)} placeholder="Calle 123, Ciudad" />
+            </div>
+            <div>
+              <Label htmlFor="emergencyPhone">Teléfono de emergencia</Label>
+              <Input
+                id="emergencyPhone"
+                value={emergencyPhone}
+                onChange={(e) => setEmergencyPhone(e.target.value)}
+                placeholder="11-2345-6789"
+                required
+              />
+            </div>
+            <div>
+              <Label htmlFor="tutorName">Tutor/a (opcional)</Label>
+              <Input id="tutorName" value={tutorName} onChange={(e) => setTutorName(e.target.value)} placeholder="Ej: Ana Pérez" />
+            </div>
+            <div>
+              <Label htmlFor="medicalNotes">Notas médicas (opcional)</Label>
+              <Textarea
+                id="medicalNotes"
+                value={medicalNotes}
+                onChange={(e) => setMedicalNotes(e.target.value)}
+                placeholder="Alergias, condiciones a tener en cuenta, etc."
+              />
             </div>
           </div>
-        )}
+        </div>
+
+        <div className="border-t border-slate-100 pt-4">
+          <p className="mb-3 text-sm font-semibold text-slate-700">Medidas (opcional)</p>
+          <div className="grid grid-cols-3 gap-3">
+            <div>
+              <Label htmlFor="heightCm">Altura (cm)</Label>
+              <Input id="heightCm" type="number" min={0} value={heightCm} onChange={(e) => setHeightCm(e.target.value)} placeholder="150" />
+            </div>
+            <div>
+              <Label htmlFor="weightKg">Peso (kg)</Label>
+              <Input id="weightKg" type="number" min={0} step="0.1" value={weightKg} onChange={(e) => setWeightKg(e.target.value)} placeholder="45" />
+            </div>
+            <div>
+              <Label htmlFor="clothingSize">Talle</Label>
+              <Select id="clothingSize" value={clothingSize} onChange={(e) => setClothingSize(e.target.value)}>
+                <option value="">—</option>
+                {TALLES.map((t) => (
+                  <option key={t} value={t}>{t}</option>
+                ))}
+              </Select>
+            </div>
+          </div>
+        </div>
+
+        <div className="border-t border-slate-100 pt-4">
+          <p className="mb-3 text-sm font-semibold text-slate-700">Disciplina y categorías (opcional)</p>
+          {disciplinas.length === 0 ? (
+            <p className="text-sm text-slate-500">
+              Todavía no hay disciplinas cargadas. Podés crear el alumno igual y asignarlo después desde su ficha.
+            </p>
+          ) : (
+            <>
+              <div className="mb-3">
+                <Label htmlFor="disciplineFilter">Disciplina</Label>
+                <Select id="disciplineFilter" value={disciplineFilter} onChange={(e) => setDisciplineFilter(e.target.value)}>
+                  <option value="todas">Todas</option>
+                  {disciplinas.map((d) => (
+                    <option key={d.id} value={d.id}>{d.name}</option>
+                  ))}
+                </Select>
+              </div>
+              {categoriasFiltradas.length === 0 ? (
+                <p className="text-sm text-slate-500">Esa disciplina todavía no tiene categorías creadas.</p>
+              ) : (
+                <div className="flex flex-wrap gap-2">
+                  {categoriasFiltradas.map((c) => {
+                    const activa = categoryIds.has(c.id);
+                    return (
+                      <button
+                        key={c.id}
+                        type="button"
+                        onClick={() => toggleCategoria(c.id)}
+                        className={clsx(
+                          "rounded-full border px-3 py-1.5 text-xs font-medium transition-colors",
+                          activa
+                            ? "border-accent bg-accent/15 text-accent"
+                            : "border-slate-300 bg-white text-slate-600 hover:border-slate-400"
+                        )}
+                      >
+                        {c.name}
+                      </button>
+                    );
+                  })}
+                </div>
+              )}
+            </>
+          )}
+        </div>
 
         <ErrorText>{error}</ErrorText>
         <Button type="submit" className="w-full" loading={isPending}>
