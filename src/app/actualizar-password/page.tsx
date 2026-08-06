@@ -1,30 +1,23 @@
-import { NextResponse } from "next/server";
+import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
-import type { EmailOtpType } from "@supabase/supabase-js";
+import { ActualizarPasswordForm } from "./ActualizarPasswordForm";
 
-/**
- * Ruta a la que Supabase redirige después de validar un link de invitación,
- * recuperación de contraseña, o magic link. Soporta los dos formatos que
- * puede usar Supabase (code o token_hash) según la configuración del proyecto.
- */
-export async function GET(request: Request) {
-  const { searchParams, origin } = new URL(request.url);
-  const code = searchParams.get("code");
-  const token_hash = searchParams.get("token_hash");
-  const type = searchParams.get("type") as EmailOtpType | null;
-  const next = searchParams.get("next") ?? "/actualizar-password";
-
+export default async function ActualizarPasswordPage() {
   const supabase = createClient();
+  const { data, error } = await supabase.auth.getUser();
 
-  if (code) {
-    const { error } = await supabase.auth.exchangeCodeForSession(code);
-    if (!error) return NextResponse.redirect(`${origin}${next}`);
-  }
+  // Si no hay sesión (el link venció o ya se usó), no tiene sentido esta pantalla.
+  if (error || !data.user) redirect("/login");
 
-  if (token_hash && type) {
-    const { error } = await supabase.auth.verifyOtp({ token_hash, type });
-    if (!error) return NextResponse.redirect(`${origin}${next}`);
-  }
-
-  return NextResponse.redirect(`${origin}/login?error=invite_link_invalid`);
+  return (
+    <div className="flex min-h-screen items-center justify-center bg-primary px-4">
+      <div className="w-full max-w-sm">
+        <div className="mb-8 text-center">
+          <h1 className="text-2xl font-bold text-white">Elegí tu contraseña</h1>
+          <p className="mt-1 text-sm text-slate-300">Para poder ingresar a partir de ahora.</p>
+        </div>
+        <ActualizarPasswordForm />
+      </div>
+    </div>
+  );
 }
