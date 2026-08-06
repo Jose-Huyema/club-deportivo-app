@@ -29,7 +29,7 @@ export async function toggleAsignacion(professorId: string, categoryId: string, 
   return { error: null };
 }
 
-export async function cambiarRol(userId: string, role: "admin" | "profe") {
+export async function cambiarRol(userId: string, role: "admin" | "profe" | "operador") {
   const check = await assertAdminAction();
   if ("error" in check) return check;
 
@@ -42,11 +42,26 @@ export async function cambiarRol(userId: string, role: "admin" | "profe") {
 }
 
 /**
- * Invita a un usuario nuevo por email usando la Admin API de Supabase.
- * Le llega un mail con un link para que elija su propia contraseña:
- * el admin nunca ve ni maneja contraseñas ajenas.
+ * Actualiza qué secciones puede ver un usuario (lo que arma "perfiles con
+ * vistas seleccionadas"). Recibe la lista completa de vistas permitidas.
  */
-export async function invitarUsuario(email: string, fullName: string, role: "admin" | "profe") {
+export async function actualizarVistas(userId: string, views: string[]) {
+  const check = await assertAdminAction();
+  if ("error" in check) return check;
+
+  const supabase = createClient();
+  const { error } = await supabase.from("profiles").update({ allowed_views: views }).eq("id", userId);
+  if (error) return { error: "No se pudieron guardar las vistas." };
+
+  revalidatePath("/admin/usuarios");
+  return { error: null };
+}
+
+/**
+ * Invita a un usuario nuevo por email usando la Admin API de Supabase.
+ * Le llega un mail con un link para que elija su propia contraseña.
+ */
+export async function invitarUsuario(email: string, fullName: string, role: "admin" | "profe" | "operador") {
   const check = await assertAdminAction();
   if ("error" in check) return check;
 
@@ -54,24 +69,14 @@ export async function invitarUsuario(email: string, fullName: string, role: "adm
   if (!fullName.trim()) return { error: "El nombre es obligatorio." };
 
   const admin = createAdminClient();
-  const { data, error } = await admin.auth.admin.inviteUserByEmail(email.trim(), {
+  const { error } = await admin.auth.admin.inviteUserByEmail(email.trim(), {
     data: { full_name: fullName.trim(), role },
   });
 
   if (error) {
-    // Log completo en los logs de Vercel (Functions → Logs) para poder
-    // diagnosticar la causa real, que Supabase a veces no expone bien al cliente.
-    console.error("Error al invitar usuario:", {
-      message: error.message,
-      status: (error as any).status,
-      code: (error as any).code,
-      name: error.name,
-      raw: error,
-    });
-
+    console.error("Error al invitar usuario:", { message: error.message, raw: error });
     const yaExiste = error.message?.toLowerCase().includes("already");
     const detalle = error.message && error.message !== "{}" ? ` (${error.message})` : "";
-
     return {
       error: yaExiste
         ? "Ese email ya está registrado."
