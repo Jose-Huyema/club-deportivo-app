@@ -1,6 +1,7 @@
 "use server";
 
 import { createClient } from "@/lib/supabase/server";
+import { assertEditorAction } from "@/lib/data/profile";
 import { revalidatePath } from "next/cache";
 
 export async function registrarMovimiento(formData: {
@@ -9,17 +10,15 @@ export async function registrarMovimiento(formData: {
   quantity: number;
   notes?: string;
 }) {
-  const supabase = createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const check = await assertEditorAction();
+  if ("error" in check) return check;
 
-  if (!user) return { error: "Sesión expirada. Volvé a iniciar sesión." };
   if (formData.quantity <= 0) return { error: "La cantidad debe ser mayor a 0." };
 
+  const supabase = createClient();
   const { error } = await supabase.from("inventory_movements").insert({
     item_id: formData.itemId,
-    user_id: user.id,
+    user_id: check.userId,
     type: formData.type,
     quantity: formData.quantity,
     notes: formData.notes || null,
