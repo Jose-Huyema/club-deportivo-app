@@ -1,11 +1,11 @@
 "use server";
 
 import { createClient } from "@/lib/supabase/server";
-import { assertAdminAction } from "@/lib/data/profile";
+import { assertEditorAction } from "@/lib/data/profile";
 import { revalidatePath } from "next/cache";
 
 export async function toggleInscripcion(studentId: string, categoryId: string, inscribir: boolean) {
-  const check = await assertAdminAction();
+  const check = await assertEditorAction();
   if ("error" in check) return check;
 
   const supabase = createClient();
@@ -27,7 +27,7 @@ export async function toggleInscripcion(studentId: string, categoryId: string, i
 }
 
 export async function setAlumnoActivo(studentId: string, isActive: boolean) {
-  const check = await assertAdminAction();
+  const check = await assertEditorAction();
   if ("error" in check) return check;
 
   const supabase = createClient();
