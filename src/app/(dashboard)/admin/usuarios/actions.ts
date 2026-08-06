@@ -41,10 +41,6 @@ export async function cambiarRol(userId: string, role: "admin" | "profe" | "oper
   return { error: null };
 }
 
-/**
- * Actualiza qué secciones puede ver un usuario (lo que arma "perfiles con
- * vistas seleccionadas"). Recibe la lista completa de vistas permitidas.
- */
 export async function actualizarVistas(userId: string, views: string[]) {
   const check = await assertAdminAction();
   if ("error" in check) return check;
@@ -59,7 +55,9 @@ export async function actualizarVistas(userId: string, views: string[]) {
 
 /**
  * Invita a un usuario nuevo por email usando la Admin API de Supabase.
- * Le llega un mail con un link para que elija su propia contraseña.
+ * redirectTo le dice a Supabase adónde mandar a la persona DESPUÉS de que
+ * el link del mail valide su token — a nuestra ruta /auth/callback, que a
+ * su vez la manda a /actualizar-password para que elija su contraseña.
  */
 export async function invitarUsuario(email: string, fullName: string, role: "admin" | "profe" | "operador") {
   const check = await assertAdminAction();
@@ -68,9 +66,18 @@ export async function invitarUsuario(email: string, fullName: string, role: "adm
   if (!email.trim()) return { error: "El email es obligatorio." };
   if (!fullName.trim()) return { error: "El nombre es obligatorio." };
 
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL;
+  if (!siteUrl) {
+    return {
+      error:
+        "Falta configurar NEXT_PUBLIC_SITE_URL en las variables de entorno de Vercel (con la URL de tu app) antes de poder invitar usuarios.",
+    };
+  }
+
   const admin = createAdminClient();
   const { error } = await admin.auth.admin.inviteUserByEmail(email.trim(), {
     data: { full_name: fullName.trim(), role },
+    redirectTo: `${siteUrl}/auth/callback?next=/actualizar-password`,
   });
 
   if (error) {
