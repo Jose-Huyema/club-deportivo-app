@@ -1,9 +1,11 @@
 import Link from "next/link";
+import { requireProfile, puedeEditar } from "@/lib/data/profile";
 import { getAlumnos } from "@/lib/data/alumnos";
 import { AlumnosList } from "./AlumnosList";
 import { Button } from "@/components/ui/Button";
 
 export default async function AlumnosPage() {
+  const profile = await requireProfile();
   const alumnos = await getAlumnos();
 
   return (
@@ -13,9 +15,11 @@ export default async function AlumnosPage() {
           <h1 className="text-xl font-bold text-primary">Alumnos</h1>
           <p className="text-sm text-slate-500">{alumnos.length} alumnos registrados</p>
         </div>
-        <Link href="/alumnos/nuevo">
-          <Button>Nuevo alumno</Button>
-        </Link>
+        {puedeEditar(profile.role) && (
+          <Link href="/alumnos/nuevo">
+            <Button>Nuevo alumno</Button>
+          </Link>
+        )}
       </div>
       <AlumnosList alumnos={alumnos} />
     </div>
