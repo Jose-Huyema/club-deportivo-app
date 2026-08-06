@@ -1,7 +1,7 @@
 "use server";
 
 import { createClient } from "@/lib/supabase/server";
-import { assertAdminAction } from "@/lib/data/profile";
+import { assertEditorAction } from "@/lib/data/profile";
 import { revalidatePath } from "next/cache";
 
 export async function crearAlumno(data: {
@@ -17,7 +17,7 @@ export async function crearAlumno(data: {
   clothingSize?: string;
   categoryIds: string[];
 }): Promise<{ error: string; studentId?: undefined } | { error: null; studentId: string }> {
-  const check = await assertAdminAction();
+  const check = await assertEditorAction();
   if ("error" in check) return { error: check.error, studentId: undefined };
 
   if (!data.fullName.trim()) return { error: "El nombre es obligatorio.", studentId: undefined };
