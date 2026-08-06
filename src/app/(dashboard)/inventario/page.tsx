@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { getInventario } from "@/lib/data/inventario";
+import { requireProfile, puedeEditar } from "@/lib/data/profile";
 import { Card } from "@/components/ui/Card";
 import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
@@ -7,6 +8,7 @@ import { EmptyState } from "@/components/ui/EmptyState";
 import { AlertTriangle } from "lucide-react";
 
 export default async function InventarioPage() {
+  const profile = await requireProfile();
   const items = await getInventario();
   const bajoStock = items.filter((i) => i.stock_bajo);
 
@@ -17,26 +19,24 @@ export default async function InventarioPage() {
           <h1 className="text-xl font-bold text-primary">Inventario</h1>
           <p className="text-sm text-slate-500">{items.length} artículos</p>
         </div>
-        <Link href="/inventario/movimientos">
-          <Button>Registrar movimiento</Button>
-        </Link>
+        {puedeEditar(profile.role) && (
+          <Link href="/inventario/movimientos">
+            <Button>Registrar movimiento</Button>
+          </Link>
+        )}
       </div>
 
       {bajoStock.length > 0 && (
         <div className="mb-5 flex items-start gap-2 rounded-xl border border-amber-200 bg-amber-50 p-3 text-sm text-amber-800">
           <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0" />
           <p>
-            <strong>{bajoStock.length}</strong> artículo(s) con stock bajo el mínimo:{" "}
-            {bajoStock.map((i) => i.name).join(", ")}.
+            <strong>{bajoStock.length}</strong> artículo(s) con stock bajo el mínimo: {bajoStock.map((i) => i.name).join(", ")}.
           </p>
         </div>
       )}
 
       {items.length === 0 ? (
-        <EmptyState
-          title="Sin artículos cargados"
-          description="Los artículos de inventario se cargan desde el panel de Admin."
-        />
+        <EmptyState title="Sin artículos cargados" description="Los artículos de inventario se cargan desde el panel de Admin." />
       ) : (
         <div className="space-y-2">
           {items.map((i) => (
@@ -51,11 +51,7 @@ export default async function InventarioPage() {
                   <p className="text-xs text-slate-500">mín. {i.min_warning_quantity}</p>
                 </div>
               </div>
-              {i.stock_bajo && (
-                <Badge tone="warning" className="mt-2">
-                  Stock bajo
-                </Badge>
-              )}
+              {i.stock_bajo && <Badge tone="warning" className="mt-2">Stock bajo</Badge>}
             </Card>
           ))}
         </div>
