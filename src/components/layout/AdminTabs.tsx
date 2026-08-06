@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation";
 import clsx from "clsx";
 
 const ADMIN_TABS = [
+  { href: "/admin/general", label: "General" },
   { href: "/admin/usuarios", label: "Usuarios" },
   { href: "/admin/categorias", label: "Categorías" },
   { href: "/admin/disciplinas", label: "Disciplinas" },
