@@ -1,28 +1,32 @@
 import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
 
+export type Role = "admin" | "profe" | "operador";
+
 export type Profile = {
   id: string;
   email: string;
   full_name: string;
-  role: "admin" | "profe";
+  role: Role;
+  allowed_views: string[];
 };
+
+export function puedeEditar(role: Role) {
+  return role === "admin" || role === "operador";
+}
 
 /**
  * Obtiene el perfil del usuario logueado. Si no hay sesión, redirige a /login.
- * Centraliza esta lógica para no repetirla en cada página protegida.
  */
 export async function requireProfile(): Promise<Profile> {
   const supabase = createClient();
 
-  // auth.getUser() devuelve error "AuthSessionMissingError" cuando no hay
-  // sesión — es un caso normal (no logueado), no una falla real.
   const { data, error: userError } = await supabase.auth.getUser();
   if (userError || !data.user) redirect("/login");
 
   const { data: profile, error } = await supabase
     .from("profiles")
-    .select("id, email, full_name, role")
+    .select("id, email, full_name, role, allowed_views")
     .eq("id", data.user.id)
     .single();
 
@@ -37,11 +41,19 @@ export async function requireAdmin(): Promise<Profile> {
   return profile;
 }
 
+export async function requireEditor(): Promise<Profile> {
+  const profile = await requireProfile();
+  if (!puedeEditar(profile.role)) redirect("/asistencia");
+  return profile;
+}
+
 /**
- * Chequeo de admin pensado para usarse DENTRO de Server Actions (no redirige,
+ * Chequeo de rol pensado para usarse DENTRO de Server Actions (no redirige,
  * devuelve un resultado de error para que la action lo propague al formulario).
  */
-export async function assertAdminAction(): Promise<{ userId: string } | { error: string }> {
+export async function assertRoleAction(
+  allowedRoles: Role[]
+): Promise<{ userId: string; role: Role } | { error: string }> {
   const supabase = createClient();
   const { data, error: userError } = await supabase.auth.getUser();
 
@@ -53,7 +65,17 @@ export async function assertAdminAction(): Promise<{ userId: string } | { error:
     .eq("id", data.user.id)
     .single();
 
-  if (profile?.role !== "admin") return { error: "No tenés permisos para esta acción." };
+  if (!profile || !allowedRoles.includes(profile.role as Role)) {
+    return { error: "No tenés permisos para esta acción." };
+  }
 
-  return { userId: data.user.id };
+  return { userId: data.user.id, role: profile.role as Role };
+}
+
+export async function assertAdminAction() {
+  return assertRoleAction(["admin"]);
+}
+
+export async function assertEditorAction() {
+  return assertRoleAction(["admin", "operador"]);
 }
