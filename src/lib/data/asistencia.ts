@@ -16,7 +16,7 @@ export type CategoriaConEstado = {
  */
 export async function getCategoriasParaAsistencia(
   userId: string,
-  role: "admin" | "profe"
+  role: "admin" | "profe" | "operador"
 ): Promise<CategoriaConEstado[]> {
   const supabase = createClient();
   const today = new Date().toISOString().slice(0, 10);
