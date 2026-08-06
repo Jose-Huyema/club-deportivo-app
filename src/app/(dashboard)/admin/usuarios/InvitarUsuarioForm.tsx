@@ -11,7 +11,7 @@ export function InvitarUsuarioForm() {
   const router = useRouter();
   const [email, setEmail] = useState("");
   const [fullName, setFullName] = useState("");
-  const [role, setRole] = useState<"profe" | "admin">("profe");
+  const [role, setRole] = useState<"profe" | "admin" | "operador">("profe");
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
   const [isPending, startTransition] = useTransition();
@@ -40,36 +40,24 @@ export function InvitarUsuarioForm() {
       <form onSubmit={handleSubmit} className="space-y-3">
         <div>
           <Label htmlFor="fullName">Nombre completo</Label>
-          <Input
-            id="fullName"
-            value={fullName}
-            onChange={(e) => setFullName(e.target.value)}
-            placeholder="Ej: María Gómez"
-            required
-          />
+          <Input id="fullName" value={fullName} onChange={(e) => setFullName(e.target.value)} placeholder="Ej: María Gómez" required />
         </div>
         <div>
           <Label htmlFor="email">Email</Label>
-          <Input
-            id="email"
-            type="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            placeholder="maria@club.com"
-            required
-          />
+          <Input id="email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="maria@club.com" required />
         </div>
         <div>
           <Label htmlFor="role">Rol</Label>
-          <Select id="role" value={role} onChange={(e) => setRole(e.target.value as "profe" | "admin")}>
-            <option value="profe">Profe</option>
-            <option value="admin">Admin</option>
+          <Select id="role" value={role} onChange={(e) => setRole(e.target.value as "profe" | "admin" | "operador")}>
+            <option value="profe">Profe (asistencia + lectura de alumnos e inventario)</option>
+            <option value="operador">Operador (alumnos, documentos y reportes)</option>
+            <option value="admin">Admin (acceso total)</option>
           </Select>
         </div>
         <ErrorText>{error}</ErrorText>
         {success && (
           <p className="text-sm font-medium text-emerald-700">
-            Invitación enviada. Le va a llegar un mail para elegir su contraseña.
+            Invitación enviada. Le va a llegar un mail para elegir su contraseña. Podés ajustar sus vistas específicas después, en la lista de abajo.
           </p>
         )}
         <Button type="submit" loading={isPending}>
