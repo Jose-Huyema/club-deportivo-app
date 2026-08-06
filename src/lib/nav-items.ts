@@ -1,4 +1,4 @@
-export type NavIconName = "asistencia" | "alumnos" | "inventario" | "admin";
+export type NavIconName = "asistencia" | "alumnos" | "inventario" | "documentos" | "reportes";
 
 export type NavItem = {
   href: string;
@@ -6,18 +6,20 @@ export type NavItem = {
   iconName: NavIconName;
 };
 
-// Archivo SIN "use client": son datos planos (strings), no componentes ni
-// funciones, así que un Server Component puede manipularlos (spread, map)
-// sin problema, y también se pueden pasar como prop a un Client Component
-// porque son serializables.
-export const NAV_ITEMS: NavItem[] = [
+// Todas las secciones posibles. Cada usuario ve solo las que tenga en
+// profile.allowed_views (la lista de "vistas permitidas" que asigna el admin).
+export const ALL_NAV_ITEMS: NavItem[] = [
   { href: "/asistencia", label: "Asistencia", iconName: "asistencia" },
   { href: "/alumnos", label: "Alumnos", iconName: "alumnos" },
   { href: "/inventario", label: "Inventario", iconName: "inventario" },
+  { href: "/documentos", label: "Documentos", iconName: "documentos" },
+  { href: "/reportes", label: "Reportes", iconName: "reportes" },
 ];
 
-export const ADMIN_NAV_ITEM: NavItem = {
+export const CONFIGURACION_ITEM = {
   href: "/admin/usuarios",
-  label: "Admin",
-  iconName: "admin",
+  label: "Configuración",
 };
+
+export const ALL_VIEW_KEYS = ["asistencia", "alumnos", "inventario", "documentos", "reportes"] as const;
+export type ViewKey = (typeof ALL_VIEW_KEYS)[number];
