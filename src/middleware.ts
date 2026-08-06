@@ -1,8 +1,15 @@
 import { createServerClient, type CookieOptions } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 
-const ADMIN_ONLY_PREFIXES = ["/admin"];
-const PROTECTED_PREFIXES = ["/asistencia", "/alumnos", "/inventario", "/admin"];
+const VIEW_BY_PREFIX: Record<string, string> = {
+  "/asistencia": "asistencia",
+  "/alumnos": "alumnos",
+  "/inventario": "inventario",
+  "/documentos": "documentos",
+  "/reportes": "reportes",
+};
+
+const PROTECTED_PREFIXES = [...Object.keys(VIEW_BY_PREFIX), "/admin"];
 
 export async function middleware(request: NextRequest) {
   let response = NextResponse.next({ request: { headers: request.headers } });
@@ -25,15 +32,11 @@ export async function middleware(request: NextRequest) {
     }
   );
 
-  // getUser() devuelve error "AuthSessionMissingError" cuando simplemente
-  // no hay sesión (visitante anónimo, cookie vencida, recién deslogueado).
-  // Eso es un caso NORMAL, no una falla: lo tratamos como "no hay usuario".
   const { data, error: userError } = await supabase.auth.getUser();
   const user = userError ? null : data.user;
 
   const path = request.nextUrl.pathname;
   const isProtected = PROTECTED_PREFIXES.some((p) => path.startsWith(p));
-  const isAdminOnly = ADMIN_ONLY_PREFIXES.some((p) => path.startsWith(p));
 
   if (isProtected && !user) {
     const url = request.nextUrl.clone();
@@ -41,14 +44,27 @@ export async function middleware(request: NextRequest) {
     return NextResponse.redirect(url);
   }
 
-  if (isAdminOnly && user) {
+  if (isProtected && user) {
     const { data: profile } = await supabase
       .from("profiles")
-      .select("role")
+      .select("role, allowed_views")
       .eq("id", user.id)
       .single();
 
-    if (profile?.role !== "admin") {
+    const role = profile?.role;
+    const allowedViews: string[] = profile?.allowed_views ?? [];
+
+    // /admin/* es exclusivo de admin, sin excepciones ni vistas personalizadas
+    if (path.startsWith("/admin") && role !== "admin") {
+      const url = request.nextUrl.clone();
+      url.pathname = "/asistencia";
+      return NextResponse.redirect(url);
+    }
+
+    // El resto de las secciones respeta las vistas permitidas del usuario
+    // (admin siempre pasa, tenga lo que tenga en allowed_views)
+    const matchedPrefix = Object.keys(VIEW_BY_PREFIX).find((p) => path.startsWith(p));
+    if (matchedPrefix && role !== "admin" && !allowedViews.includes(VIEW_BY_PREFIX[matchedPrefix])) {
       const url = request.nextUrl.clone();
       url.pathname = "/asistencia";
       return NextResponse.redirect(url);
@@ -60,6 +76,6 @@ export async function middleware(request: NextRequest) {
 
 export const config = {
   matcher: [
-    "/((?!_next/static|_next/image|favicon.ico|icons|manifest.json).*)",
+    "/((?!_next/static|_next/image|favicon.ico|icons|manifest.json|logo.png|watermark.png).*)",
   ],
 };
