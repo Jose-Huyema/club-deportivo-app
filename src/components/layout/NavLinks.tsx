@@ -3,54 +3,49 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import clsx from "clsx";
-import { CalendarCheck, Users, Package, Shield } from "lucide-react";
+import { CalendarCheck, Users, Package, FileText, BarChart3, Settings } from "lucide-react";
 import type { NavItem, NavIconName } from "@/lib/nav-items";
 
-// Los componentes de ícono (funciones) se resuelven ACÁ ADENTRO, en el
-// archivo cliente. Nunca se reciben como prop desde el servidor: solo
-// llega un string (iconName), que es serializable.
 const ICONS: Record<NavIconName, typeof CalendarCheck> = {
   asistencia: CalendarCheck,
   alumnos: Users,
   inventario: Package,
-  admin: Shield,
+  documentos: FileText,
+  reportes: BarChart3,
 };
 
-function useIsActive() {
+export function HorizontalNavLink({ item }: { item: NavItem & { icon?: undefined } }) {
   const pathname = usePathname();
-  return (href: string) => pathname === href || pathname.startsWith(href + "/");
-}
-
-export function DesktopNavLink({ item }: { item: NavItem }) {
-  const isActive = useIsActive()(item.href);
+  const isActive = pathname === item.href || pathname.startsWith(item.href + "/");
   const Icon = ICONS[item.iconName];
+
   return (
     <Link
       href={item.href}
       className={clsx(
-        "flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-colors",
-        isActive ? "bg-accent/15 text-accent" : "text-slate-300 hover:bg-white/5 hover:text-white"
+        "flex shrink-0 items-center gap-1.5 whitespace-nowrap rounded-full px-3 py-1.5 text-sm font-medium transition-colors",
+        isActive ? "bg-accent/20 text-accent" : "text-slate-300 hover:bg-white/10 hover:text-white"
       )}
     >
-      <Icon className="h-5 w-5" />
+      <Icon className="h-4 w-4" />
       {item.label}
     </Link>
   );
 }
 
-export function MobileNavLink({ item }: { item: NavItem }) {
-  const isActive = useIsActive()(item.href);
-  const Icon = ICONS[item.iconName];
+export function ConfiguracionNavLink({ href, label }: { href: string; label: string }) {
+  const pathname = usePathname();
+  const isActive = pathname.startsWith("/admin");
   return (
     <Link
-      href={item.href}
+      href={href}
       className={clsx(
-        "flex flex-1 flex-col items-center gap-1 py-2 text-xs font-medium",
-        isActive ? "text-accent" : "text-slate-400"
+        "flex shrink-0 items-center gap-1.5 whitespace-nowrap rounded-full px-3 py-1.5 text-sm font-medium transition-colors",
+        isActive ? "bg-accent/20 text-accent" : "text-slate-300 hover:bg-white/10 hover:text-white"
       )}
     >
-      <Icon className="h-5 w-5" />
-      {item.label}
+      <Settings className="h-4 w-4" />
+      {label}
     </Link>
   );
 }
