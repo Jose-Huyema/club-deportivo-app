@@ -1,7 +1,7 @@
 import { notFound } from "next/navigation";
 import { getAlumnoDetalle } from "@/lib/data/alumnos";
 import { getCategorias } from "@/lib/data/admin";
-import { requireProfile } from "@/lib/data/profile";
+import { requireProfile, puedeEditar } from "@/lib/data/profile";
 import { Card } from "@/components/ui/Card";
 import { Badge } from "@/components/ui/Badge";
 import { EmptyState } from "@/components/ui/EmptyState";
@@ -22,7 +22,7 @@ export default async function AlumnoDetallePage({ params }: { params: { studentI
   ]);
 
   if (!alumno) notFound();
-  const esAdmin = profile.role === "admin";
+  const puedeEditarAlumno = puedeEditar(profile.role);
 
   return (
     <div>
@@ -33,7 +33,7 @@ export default async function AlumnoDetallePage({ params }: { params: { studentI
             {alumno.categorias.length > 0 ? alumno.categorias.join(", ") : "Sin categoría asignada"}
           </p>
         </div>
-        {esAdmin ? (
+        {puedeEditarAlumno ? (
           <ActivoToggle studentId={alumno.id} isActive={alumno.is_active} />
         ) : (
           !alumno.is_active && <Badge tone="neutral">Inactivo</Badge>
@@ -82,35 +82,22 @@ export default async function AlumnoDetallePage({ params }: { params: { studentI
           <p className="mb-2 text-sm font-semibold text-slate-700">Medidas</p>
           <div className="flex gap-4 text-sm">
             {alumno.height_cm && (
-              <div>
-                <span className="block text-slate-500">Altura</span>
-                <span className="font-medium text-slate-900">{alumno.height_cm} cm</span>
-              </div>
+              <div><span className="block text-slate-500">Altura</span><span className="font-medium text-slate-900">{alumno.height_cm} cm</span></div>
             )}
             {alumno.weight_kg && (
-              <div>
-                <span className="block text-slate-500">Peso</span>
-                <span className="font-medium text-slate-900">{alumno.weight_kg} kg</span>
-              </div>
+              <div><span className="block text-slate-500">Peso</span><span className="font-medium text-slate-900">{alumno.weight_kg} kg</span></div>
             )}
             {alumno.clothing_size && (
-              <div>
-                <span className="block text-slate-500">Talle</span>
-                <span className="font-medium text-slate-900">{alumno.clothing_size}</span>
-              </div>
+              <div><span className="block text-slate-500">Talle</span><span className="font-medium text-slate-900">{alumno.clothing_size}</span></div>
             )}
           </div>
         </Card>
       )}
 
-      {esAdmin && categorias.length > 0 && (
+      {puedeEditarAlumno && categorias.length > 0 && (
         <Card className="mb-4">
           <p className="mb-2 text-sm font-semibold text-slate-700">Categorías inscriptas</p>
-          <CategoriasEditor
-            studentId={alumno.id}
-            categorias={categorias}
-            categoriaIdsIniciales={alumno.categoria_ids}
-          />
+          <CategoriasEditor studentId={alumno.id} categorias={categorias} categoriaIdsIniciales={alumno.categoria_ids} />
         </Card>
       )}
 
