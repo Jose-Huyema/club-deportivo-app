@@ -30,7 +30,8 @@ export type ProfesorConCategorias = {
   id: string;
   full_name: string;
   email: string;
-  role: "admin" | "profe";
+  role: "admin" | "profe" | "operador";
+  allowed_views: string[];
   categoria_ids: string[];
 };
 
@@ -38,7 +39,7 @@ export async function getProfesores(): Promise<ProfesorConCategorias[]> {
   const supabase = createClient();
   const { data: perfiles } = await supabase
     .from("profiles")
-    .select("id, full_name, email, role")
+    .select("id, full_name, email, role, allowed_views")
     .order("full_name");
 
   const { data: asignaciones } = await supabase
@@ -54,6 +55,7 @@ export async function getProfesores(): Promise<ProfesorConCategorias[]> {
 
   return (perfiles ?? []).map((p) => ({
     ...p,
+    allowed_views: p.allowed_views ?? [],
     categoria_ids: mapa.get(p.id) ?? [],
   }));
 }
