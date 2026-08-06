@@ -1,11 +1,11 @@
 import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
-import { requireAdmin } from "@/lib/data/profile";
+import { requireEditor } from "@/lib/data/profile";
 import { getCategorias, getDisciplinas } from "@/lib/data/admin";
 import { NuevoAlumnoForm } from "./NuevoAlumnoForm";
 
 export default async function NuevoAlumnoPage() {
-  await requireAdmin();
+  await requireEditor();
   const [categorias, disciplinas] = await Promise.all([getCategorias(), getDisciplinas()]);
 
   return (
