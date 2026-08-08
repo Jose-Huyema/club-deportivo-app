@@ -4,8 +4,9 @@ import { useState, useTransition } from "react";
 import clsx from "clsx";
 import { Card } from "@/components/ui/Card";
 import { Select } from "@/components/ui/FormField";
+import { Badge } from "@/components/ui/Badge";
 import type { ProfesorConCategorias, Categoria } from "@/lib/data/admin";
-import { toggleAsignacion, cambiarRol, actualizarVistas } from "./actions";
+import { toggleAsignacion, cambiarRol, actualizarVistas, alternarHabilitado } from "./actions";
 
 const VISTAS_DISPONIBLES: { key: string; label: string }[] = [
   { key: "asistencia", label: "Asistencia" },
@@ -25,6 +26,7 @@ export function UsuarioCard({
   const [asignadas, setAsignadas] = useState(new Set(usuario.categoria_ids));
   const [role, setRole] = useState(usuario.role);
   const [vistas, setVistas] = useState(new Set(usuario.allowed_views));
+  const [habilitado, setHabilitado] = useState(usuario.habilitado);
   const [isPending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
 
@@ -68,34 +70,59 @@ export function UsuarioCard({
     const nuevasVistas = new Set(vistas);
     tenia ? nuevasVistas.delete(key) : nuevasVistas.add(key);
     setVistas(nuevasVistas);
-
     startTransition(async () => {
       const result = await actualizarVistas(usuario.id, Array.from(nuevasVistas));
       if (result.error) {
         setError(result.error);
-        setVistas(new Set(vistas)); // revertir
+        setVistas(new Set(vistas));
+      }
+    });
+  }
+
+  function handleToggleHabilitado() {
+    const anterior = habilitado;
+    setError(null);
+    setHabilitado(!anterior);
+    startTransition(async () => {
+      const result = await alternarHabilitado(usuario.id, !anterior);
+      if (result.error) {
+        setError(result.error);
+        setHabilitado(anterior);
       }
     });
   }
 
   return (
-    <Card>
+    <Card className={!habilitado ? "opacity-60" : undefined}>
       <div className="mb-3 flex items-center justify-between gap-3">
         <div>
           <p className="font-medium text-slate-900">{usuario.full_name}</p>
           <p className="text-sm text-slate-500">{usuario.email}</p>
         </div>
-        <Select
-          value={role}
-          onChange={(e) => handleCambiarRol(e.target.value as "admin" | "profe" | "operador")}
-          disabled={isPending}
-          className="w-auto"
-        >
-          <option value="profe">Profe</option>
-          <option value="operador">Operador</option>
-          <option value="admin">Admin</option>
-        </Select>
+        <div className="flex items-center gap-2">
+          <Select
+            value={role}
+            onChange={(e) => handleCambiarRol(e.target.value as "admin" | "profe" | "operador")}
+            disabled={isPending}
+            className="w-auto"
+          >
+            <option value="profe">Profe</option>
+            <option value="operador">Operador</option>
+            <option value="admin">Admin</option>
+          </Select>
+        </div>
       </div>
+
+      <button
+        type="button"
+        onClick={handleToggleHabilitado}
+        disabled={isPending}
+        className="mb-3"
+      >
+        <Badge tone={habilitado ? "success" : "danger"}>
+          {habilitado ? "Habilitado — tocar para deshabilitar" : "Deshabilitado — tocar para habilitar"}
+        </Badge>
+      </button>
 
       <div className="mb-3">
         <p className="mb-1.5 text-xs font-semibold uppercase tracking-wide text-slate-400">Vistas permitidas</p>
