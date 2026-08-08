@@ -1,4 +1,6 @@
+
 import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/admin";
 
 export type Disciplina = { id: string; name: string; description: string | null };
 
@@ -33,6 +35,7 @@ export type ProfesorConCategorias = {
   role: "admin" | "profe" | "operador";
   allowed_views: string[];
   categoria_ids: string[];
+  habilitado: boolean;
 };
 
 export async function getProfesores(): Promise<ProfesorConCategorias[]> {
@@ -53,9 +56,25 @@ export async function getProfesores(): Promise<ProfesorConCategorias[]> {
     mapa.set(a.professor_id, arr);
   });
 
+  // Estado habilitado/deshabilitado vive en auth.users (banned_until),
+  // no en la tabla profiles, así que necesita la Admin API.
+  let baneados = new Set<string>();
+  try {
+    const admin = createAdminClient();
+    const { data: usersData } = await admin.auth.admin.listUsers({ perPage: 1000 });
+    baneados = new Set(
+      (usersData?.users ?? [])
+        .filter((u) => u.banned_until && new Date(u.banned_until) > new Date())
+        .map((u) => u.id)
+    );
+  } catch {
+    // Si falla, asumimos que todos están habilitados en vez de romper la pantalla.
+  }
+
   return (perfiles ?? []).map((p) => ({
     ...p,
     allowed_views: p.allowed_views ?? [],
     categoria_ids: mapa.get(p.id) ?? [],
+    habilitado: !baneados.has(p.id),
   }));
 }
