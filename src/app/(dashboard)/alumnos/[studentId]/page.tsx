@@ -1,9 +1,12 @@
 import { notFound } from "next/navigation";
+import Link from "next/link";
+import { IdCard } from "lucide-react";
 import { getAlumnoDetalle } from "@/lib/data/alumnos";
 import { getCategorias } from "@/lib/data/admin";
 import { requireProfile, puedeEditar } from "@/lib/data/profile";
 import { Card } from "@/components/ui/Card";
 import { Badge } from "@/components/ui/Badge";
+import { Button } from "@/components/ui/Button";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { ActivoToggle } from "./ActivoToggle";
 import { CategoriasEditor } from "./CategoriasEditor";
@@ -39,6 +42,13 @@ export default async function AlumnoDetallePage({ params }: { params: { studentI
           !alumno.is_active && <Badge tone="neutral">Inactivo</Badge>
         )}
       </div>
+
+      <Link href={`/alumnos/${alumno.id}/carnet`} className="mb-4 block">
+        <Button variant="secondary" className="w-full">
+          <IdCard className="h-4 w-4" />
+          Ver / imprimir carnet
+        </Button>
+      </Link>
 
       <Card className="mb-4 space-y-2 text-sm">
         {alumno.dni && (
