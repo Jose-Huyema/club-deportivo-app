@@ -41,6 +41,10 @@ export async function cambiarRol(userId: string, role: "admin" | "profe" | "oper
   return { error: null };
 }
 
+/**
+ * Actualiza qué secciones puede ver un usuario (lo que arma "perfiles con
+ * vistas seleccionadas"). Recibe la lista completa de vistas permitidas.
+ */
 export async function actualizarVistas(userId: string, views: string[]) {
   const check = await assertAdminAction();
   if ("error" in check) return check;
@@ -76,6 +80,9 @@ export async function alternarHabilitado(userId: string, habilitar: boolean) {
   revalidatePath("/admin/usuarios");
   return { error: null };
 }
+
+/**
+ * Invita a un usuario nuevo por email usando la Admin API de Supabase.
  * redirectTo le dice a Supabase adónde mandar a la persona DESPUÉS de que
  * el link del mail valide su token — a nuestra ruta /auth/callback, que a
  * su vez la manda a /actualizar-password para que elija su contraseña.
