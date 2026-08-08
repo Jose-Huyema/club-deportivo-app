@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Users, IdCard } from "lucide-react";
+import { Users, CreditCard } from "lucide-react";
 import { requireProfile } from "@/lib/data/profile";
 import { redirect } from "next/navigation";
 import { Card } from "@/components/ui/Card";
@@ -16,7 +16,7 @@ export default async function ReportesPage() {
       <div className="space-y-3">
         <Link href="/reportes/alumnos">
           <Card className="flex items-center gap-3 hover:shadow-md">
-            <IdCard className="h-5 w-5 text-accent" />
+            <CreditCard className="h-5 w-5 text-accent" />
             <div>
               <p className="font-semibold text-slate-900">Alumnos</p>
               <p className="text-sm text-slate-500">Listado completo con datos de contacto y categorías</p>
