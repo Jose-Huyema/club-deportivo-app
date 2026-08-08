@@ -10,15 +10,20 @@ export default async function AlumnosPage() {
 
   return (
     <div>
-      <div className="mb-5 flex items-center justify-between">
+      <div className="mb-5 flex items-center justify-between gap-2">
         <div>
           <h1 className="text-xl font-bold text-primary">Alumnos</h1>
           <p className="text-sm text-slate-500">{alumnos.length} alumnos registrados</p>
         </div>
         {puedeEditar(profile.role) && (
-          <Link href="/alumnos/nuevo">
-            <Button>Nuevo alumno</Button>
-          </Link>
+          <div className="flex gap-2">
+            <Link href="/alumnos/importar">
+              <Button variant="secondary">Importar</Button>
+            </Link>
+            <Link href="/alumnos/nuevo">
+              <Button>Nuevo alumno</Button>
+            </Link>
+          </div>
         )}
       </div>
       <AlumnosList alumnos={alumnos} />
