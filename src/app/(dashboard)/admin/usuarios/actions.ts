@@ -54,7 +54,28 @@ export async function actualizarVistas(userId: string, views: string[]) {
 }
 
 /**
- * Invita a un usuario nuevo por email usando la Admin API de Supabase.
+ * Habilita o deshabilita el acceso de un usuario (no borra nada, solo le
+ * impide iniciar sesión). Usa la Admin API porque este estado vive en
+ * auth.users, no en una tabla que podamos tocar con el cliente normal.
+ */
+export async function alternarHabilitado(userId: string, habilitar: boolean) {
+  const check = await assertAdminAction();
+  if ("error" in check) return check;
+
+  if (userId === check.userId && !habilitar) {
+    return { error: "No podés deshabilitarte a vos mismo." };
+  }
+
+  const admin = createAdminClient();
+  const { error } = await admin.auth.admin.updateUserById(userId, {
+    ban_duration: habilitar ? "none" : "876000h", // ~100 años = deshabilitado indefinidamente
+  });
+
+  if (error) return { error: "No se pudo actualizar el estado del usuario." };
+
+  revalidatePath("/admin/usuarios");
+  return { error: null };
+}
  * redirectTo le dice a Supabase adónde mandar a la persona DESPUÉS de que
  * el link del mail valide su token — a nuestra ruta /auth/callback, que a
  * su vez la manda a /actualizar-password para que elija su contraseña.
