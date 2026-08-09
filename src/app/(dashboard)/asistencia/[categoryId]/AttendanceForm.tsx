@@ -6,6 +6,7 @@ import clsx from "clsx";
 import { Check, X, FileText } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
+import { ScannerInput } from "@/components/ui/ScannerInput";
 import type { AlumnoParaAsistencia } from "@/lib/data/asistencia";
 import { guardarAsistencia } from "./actions";
 
@@ -29,6 +30,7 @@ export function AttendanceForm({
   const [alumnos, setAlumnos] = useState(alumnosIniciales);
   const [isPending, startTransition] = useTransition();
   const [feedback, setFeedback] = useState<{ type: "success" | "error"; message: string } | null>(null);
+  const [scanFeedback, setScanFeedback] = useState<string | null>(null);
 
   function ciclarEstado(studentId: string) {
     setAlumnos((prev) =>
@@ -38,6 +40,26 @@ export function AttendanceForm({
         return { ...a, status: siguiente };
       })
     );
+  }
+
+  function handleScan(codigo: string) {
+    const match = codigo.match(/^STUDENT:(.+)$/);
+    const idBuscado = match ? match[1] : null;
+    const dniBuscado = match ? null : codigo.trim();
+
+    const alumno = alumnos.find(
+      (a) => (idBuscado && a.student_id === idBuscado) || (dniBuscado && a.dni === dniBuscado)
+    );
+
+    if (!alumno) {
+      setScanFeedback("Ese carnet no corresponde a ningún alumno de esta categoría.");
+      return;
+    }
+
+    setAlumnos((prev) =>
+      prev.map((a) => (a.student_id === alumno.student_id ? { ...a, status: "presente" } : a))
+    );
+    setScanFeedback(`${alumno.full_name} marcado presente.`);
   }
 
   function handleGuardar() {
@@ -60,6 +82,11 @@ export function AttendanceForm({
 
   return (
     <div>
+      <Card className="mb-4">
+        <ScannerInput onScan={handleScan} placeholder="Escaneá el carnet para marcar presente…" />
+        {scanFeedback && <p className="mt-2 text-center text-xs text-slate-500">{scanFeedback}</p>}
+      </Card>
+
       <p className="mb-3 text-sm font-medium text-slate-600">
         {presentes} de {alumnos.length} presentes
       </p>
