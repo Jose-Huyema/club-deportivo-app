@@ -1,3 +1,4 @@
+import { cache } from "react";
 import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
 
@@ -16,13 +17,15 @@ export function puedeEditar(role: Role) {
 }
 
 /**
- * Obtiene el perfil del usuario logueado. Si no hay sesión, redirige a /login.
+ * Trae el perfil UNA sola vez por request, sin importar cuántas veces se
+ * llame (layout + page + componentes anidados). React.cache() memoiza el
+ * resultado dentro del mismo ciclo de render — antes esto disparaba la
+ * misma consulta 2-3 veces por navegación.
  */
-export async function requireProfile(): Promise<Profile> {
+const getCachedProfile = cache(async (): Promise<Profile | null> => {
   const supabase = createClient();
-
   const { data, error: userError } = await supabase.auth.getUser();
-  if (userError || !data.user) redirect("/login");
+  if (userError || !data.user) return null;
 
   const { data: profile, error } = await supabase
     .from("profiles")
@@ -30,9 +33,17 @@ export async function requireProfile(): Promise<Profile> {
     .eq("id", data.user.id)
     .single();
 
-  if (error || !profile) redirect("/login");
-
+  if (error || !profile) return null;
   return profile as Profile;
+});
+
+/**
+ * Obtiene el perfil del usuario logueado. Si no hay sesión, redirige a /login.
+ */
+export async function requireProfile(): Promise<Profile> {
+  const profile = await getCachedProfile();
+  if (!profile) redirect("/login");
+  return profile;
 }
 
 export async function requireAdmin(): Promise<Profile> {
