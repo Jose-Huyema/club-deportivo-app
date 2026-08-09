@@ -61,6 +61,7 @@ export async function getCategoriasParaAsistencia(
 export type AlumnoParaAsistencia = {
   student_id: string;
   full_name: string;
+  dni: string | null;
   status: "presente" | "ausente" | "justificado";
 };
 
@@ -86,7 +87,7 @@ export async function getAlumnosParaAsistencia(
 
   const { data: inscripciones } = await supabase
     .from("enrollments")
-    .select("student_id, students!inner(id, full_name, is_active)")
+    .select("student_id, students!inner(id, full_name, dni, is_active)")
     .eq("category_id", categoryId)
     .eq("students.is_active", true);
 
@@ -110,6 +111,7 @@ export async function getAlumnosParaAsistencia(
     .map((i: any) => ({
       student_id: i.students.id,
       full_name: i.students.full_name,
+      dni: i.students.dni,
       status: detallesMap.get(i.students.id) ?? "presente",
     }))
     .sort((a, b) => a.full_name.localeCompare(b.full_name));
