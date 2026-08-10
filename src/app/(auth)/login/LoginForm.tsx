@@ -21,10 +21,7 @@ export function LoginForm() {
     setLoading(true);
     setError(null);
 
-    const { error: signInError } = await supabase.auth.signInWithPassword({
-      email,
-      password,
-    });
+    const { error: signInError } = await supabase.auth.signInWithPassword({ email, password });
 
     if (signInError) {
       setError(
@@ -36,7 +33,7 @@ export function LoginForm() {
       return;
     }
 
-    router.push("/asistencia");
+    router.push("/");
     router.refresh();
   }
 
@@ -45,27 +42,11 @@ export function LoginForm() {
       <form onSubmit={handleSubmit} noValidate>
         <div className="mb-4">
           <Label htmlFor="email">Email</Label>
-          <Input
-            id="email"
-            type="email"
-            autoComplete="email"
-            required
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            placeholder="profe@club.com"
-          />
+          <Input id="email" type="email" autoComplete="email" required value={email} onChange={(e) => setEmail(e.target.value)} placeholder="profe@club.com" />
         </div>
         <div className="mb-2">
           <Label htmlFor="password">Contraseña</Label>
-          <Input
-            id="password"
-            type="password"
-            autoComplete="current-password"
-            required
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            placeholder="••••••••"
-          />
+          <Input id="password" type="password" autoComplete="current-password" required value={password} onChange={(e) => setPassword(e.target.value)} placeholder="••••••••" />
         </div>
         <ErrorText>{error}</ErrorText>
         <Button type="submit" className="mt-4 w-full" loading={loading}>
