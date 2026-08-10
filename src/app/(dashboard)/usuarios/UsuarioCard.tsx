@@ -1,104 +1,83 @@
 "use client";
 
-import { useState, useTransition } from "react";
-import clsx from "clsx";
+import { useState, FormEvent, useTransition } from "react";
+import { useRouter } from "next/navigation";
 import { Card } from "@/components/ui/Card";
-import { Select } from "@/components/ui/FormField";
-import type { ProfesorConCategorias, Categoria } from "@/lib/data/admin";
-import { toggleAsignacion, cambiarRol } from "./actions";
+import { Button } from "@/components/ui/Button";
+import { Label, Input, Select, ErrorText } from "@/components/ui/FormField";
+import { invitarUsuario } from "./actions";
 
-export function UsuarioCard({
-  usuario,
-  categorias,
-}: {
-  usuario: ProfesorConCategorias;
-  categorias: Categoria[];
-}) {
-  const [asignadas, setAsignadas] = useState(new Set(usuario.categoria_ids));
-  const [role, setRole] = useState(usuario.role);
-  const [isPending, startTransition] = useTransition();
+export function InvitarUsuarioForm() {
+  const router = useRouter();
+  const [email, setEmail] = useState("");
+  const [fullName, setFullName] = useState("");
+  const [role, setRole] = useState<"profe" | "admin" | "operador">("profe");
+  const [genero, setGenero] = useState<"M" | "F" | "">("");
   const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState(false);
+  const [isPending, startTransition] = useTransition();
 
-  function handleToggleCategoria(categoryId: string) {
-    const yaAsignada = asignadas.has(categoryId);
+  function handleSubmit(e: FormEvent) {
+    e.preventDefault();
     setError(null);
-
-    setAsignadas((prev) => {
-      const next = new Set(prev);
-      yaAsignada ? next.delete(categoryId) : next.add(categoryId);
-      return next;
-    });
+    setSuccess(false);
 
     startTransition(async () => {
-      const result = await toggleAsignacion(usuario.id, categoryId, !yaAsignada);
+      const result = await invitarUsuario(email, fullName, role, genero);
       if (result.error) {
         setError(result.error);
-        setAsignadas((prev) => {
-          const next = new Set(prev);
-          yaAsignada ? next.add(categoryId) : next.delete(categoryId);
-          return next;
-        });
+        return;
       }
-    });
-  }
-
-  function handleCambiarRol(nuevoRol: "admin" | "profe") {
-    const anterior = role;
-    setError(null);
-    setRole(nuevoRol);
-
-    startTransition(async () => {
-      const result = await cambiarRol(usuario.id, nuevoRol);
-      if (result.error) {
-        setError(result.error);
-        setRole(anterior);
-      }
+      setSuccess(true);
+      setEmail("");
+      setFullName("");
+      router.refresh();
     });
   }
 
   return (
     <Card>
-      <div className="mb-3 flex items-center justify-between gap-3">
+      <p className="mb-3 text-sm font-semibold text-slate-700">Invitar nuevo usuario</p>
+      <form onSubmit={handleSubmit} className="space-y-3">
         <div>
-          <p className="font-medium text-slate-900">{usuario.full_name}</p>
-          <p className="text-sm text-slate-500">{usuario.email}</p>
+          <Label htmlFor="fullName">Nombre completo</Label>
+          <Input id="fullName" value={fullName} onChange={(e) => setFullName(e.target.value)} placeholder="Ej: María Gómez" required />
         </div>
-        <Select
-          value={role}
-          onChange={(e) => handleCambiarRol(e.target.value as "admin" | "profe")}
-          disabled={isPending}
-          className="w-auto"
-        >
-          <option value="profe">Profe</option>
-          <option value="admin">Admin</option>
-        </Select>
-      </div>
-
-      {categorias.length > 0 && (
-        <div className="flex flex-wrap gap-2">
-          {categorias.map((c) => {
-            const activa = asignadas.has(c.id);
-            return (
-              <button
-                key={c.id}
-                type="button"
-                disabled={isPending}
-                onClick={() => handleToggleCategoria(c.id)}
-                className={clsx(
-                  "rounded-full border px-3 py-1.5 text-xs font-medium transition-colors disabled:opacity-50",
-                  activa
-                    ? "border-accent bg-accent/15 text-accent"
-                    : "border-slate-300 bg-white text-slate-600 hover:border-slate-400"
-                )}
-              >
-                {c.name}
-              </button>
-            );
-          })}
+        <div>
+          <Label htmlFor="email">Email</Label>
+          <Input id="email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="maria@club.com" required />
         </div>
-      )}
-
-      {error && <p className="mt-2 text-sm text-red-600">{error}</p>}
+        <div className="grid grid-cols-2 gap-3">
+          <div>
+            <Label htmlFor="role">Rol</Label>
+            <Select id="role" value={role} onChange={(e) => setRole(e.target.value as "profe" | "admin" | "operador")}>
+              <option value="profe">Profe</option>
+              <option value="operador">Operador</option>
+              <option value="admin">Admin</option>
+            </Select>
+          </div>
+          <div>
+            <Label htmlFor="genero">Género (opcional)</Label>
+            <Select id="genero" value={genero} onChange={(e) => setGenero(e.target.value as "M" | "F" | "")}>
+              <option value="">—</option>
+              <option value="F">Femenino</option>
+              <option value="M">Masculino</option>
+            </Select>
+          </div>
+        </div>
+        <p className="text-xs text-slate-400">
+          El género solo se usa para mostrar "Profesor" o "Profesora" en vez de "Profe" genérico.
+        </p>
+        <ErrorText>{error}</ErrorText>
+        {success && (
+          <p className="text-sm font-medium text-emerald-700">
+            Invitación enviada. Le va a llegar un mail para elegir su contraseña.
+          </p>
+        )}
+        <Button type="submit" loading={isPending}>
+          Enviar invitación
+        </Button>
+      </form>
     </Card>
   );
 }
