@@ -1,6 +1,6 @@
-
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
+import type { Genero } from "@/lib/data/profile";
 
 export type Disciplina = { id: string; name: string; description: string | null };
 
@@ -33,6 +33,7 @@ export type ProfesorConCategorias = {
   full_name: string;
   email: string;
   role: "admin" | "profe" | "operador";
+  genero: Genero;
   allowed_views: string[];
   categoria_ids: string[];
   habilitado: boolean;
@@ -42,7 +43,7 @@ export async function getProfesores(): Promise<ProfesorConCategorias[]> {
   const supabase = createClient();
   const { data: perfiles } = await supabase
     .from("profiles")
-    .select("id, full_name, email, role, allowed_views")
+    .select("id, full_name, email, role, genero, allowed_views")
     .order("full_name");
 
   const { data: asignaciones } = await supabase
@@ -56,8 +57,6 @@ export async function getProfesores(): Promise<ProfesorConCategorias[]> {
     mapa.set(a.professor_id, arr);
   });
 
-  // Estado habilitado/deshabilitado vive en auth.users (banned_until),
-  // no en la tabla profiles, así que necesita la Admin API.
   let baneados = new Set<string>();
   try {
     const admin = createAdminClient();
