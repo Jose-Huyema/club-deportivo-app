@@ -45,7 +45,8 @@ export async function getCategoriasParaAsistencia(
   const { data: yaTomadas } = await supabase
     .from("attendances")
     .select("category_id")
-    .eq("date", today);
+    .eq("date", today)
+    .eq("finalized", true);
 
   const tomadasSet = new Set((yaTomadas ?? []).map((a) => a.category_id));
 
@@ -67,17 +68,19 @@ export type AlumnoParaAsistencia = {
 
 /**
  * Alumnos activos inscriptos en la categoría, con el estado de asistencia
- * de hoy si ya existe (para poder editar), o "presente" por defecto.
+ * de la fecha pedida si ya existe (para poder editar/revisar), o
+ * "presente" por defecto. Incluye si ese día ya quedó finalizado.
  */
 export async function getAlumnosParaAsistencia(
-  categoryId: string
+  categoryId: string,
+  date: string
 ): Promise<{
   categoryName: string;
   attendanceId: string | null;
+  finalized: boolean;
   alumnos: AlumnoParaAsistencia[];
 }> {
   const supabase = createClient();
-  const today = new Date().toISOString().slice(0, 10);
 
   const { data: categoria } = await supabase
     .from("categories")
@@ -93,9 +96,9 @@ export async function getAlumnosParaAsistencia(
 
   const { data: attendance } = await supabase
     .from("attendances")
-    .select("id")
+    .select("id, finalized")
     .eq("category_id", categoryId)
-    .eq("date", today)
+    .eq("date", date)
     .maybeSingle();
 
   let detallesMap = new Map<string, "presente" | "ausente" | "justificado">();
@@ -119,6 +122,41 @@ export async function getAlumnosParaAsistencia(
   return {
     categoryName: categoria?.name ?? "Categoría",
     attendanceId: attendance?.id ?? null,
+    finalized: attendance?.finalized ?? false,
     alumnos,
   };
+}
+
+export type DiaDelMes = {
+  date: string; // YYYY-MM-DD
+  estado: "sin_registrar" | "en_progreso" | "finalizada";
+};
+
+/**
+ * Estado de cada día del mes para una categoría: sin registrar, en
+ * progreso (se guardó pero no se finalizó) o finalizada. Alimenta el
+ * calendario mensual de asistencia.
+ */
+export async function getResumenMensual(
+  categoryId: string,
+  year: number,
+  month: number // 1-12
+): Promise<Map<string, "en_progreso" | "finalizada">> {
+  const supabase = createClient();
+  const inicio = `${year}-${String(month).padStart(2, "0")}-01`;
+  const ultimoDia = new Date(year, month, 0).getDate();
+  const fin = `${year}-${String(month).padStart(2, "0")}-${String(ultimoDia).padStart(2, "0")}`;
+
+  const { data } = await supabase
+    .from("attendances")
+    .select("date, finalized")
+    .eq("category_id", categoryId)
+    .gte("date", inicio)
+    .lte("date", fin);
+
+  const mapa = new Map<string, "en_progreso" | "finalizada">();
+  (data ?? []).forEach((a) => {
+    mapa.set(a.date, a.finalized ? "finalizada" : "en_progreso");
+  });
+  return mapa;
 }
