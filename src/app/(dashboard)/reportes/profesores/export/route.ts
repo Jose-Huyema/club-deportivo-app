@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { getReporteProfesores, toCsv } from "@/lib/data/reportes";
-import { requireProfile } from "@/lib/data/profile";
+import { requireProfile, labelRol } from "@/lib/data/profile";
 
 export async function GET() {
   const profile = await requireProfile();
@@ -9,10 +9,11 @@ export async function GET() {
   }
 
   const usuarios = await getReporteProfesores();
-  const csv = toCsv(usuarios, [
+  const filas = usuarios.map((u) => ({ ...u, rol_legible: labelRol(u.role, u.genero) }));
+  const csv = toCsv(filas, [
     { key: "full_name", label: "Nombre" },
     { key: "email", label: "Email" },
-    { key: "role", label: "Rol" },
+    { key: "rol_legible", label: "Rol" },
     { key: "categorias", label: "Categorías" },
   ]);
 
