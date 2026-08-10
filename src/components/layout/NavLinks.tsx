@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import clsx from "clsx";
-import { CalendarCheck, Users, Package, FileText, BarChart3, Settings } from "lucide-react";
+import { CalendarCheck, Users, Package, FileText, BarChart3, UserCog, Settings, Home } from "lucide-react";
 import type { NavItem, NavIconName } from "@/lib/nav-items";
 
 const ICONS: Record<NavIconName, typeof CalendarCheck> = {
@@ -14,36 +14,53 @@ const ICONS: Record<NavIconName, typeof CalendarCheck> = {
   reportes: BarChart3,
 };
 
-export function HorizontalNavLink({ item }: { item: NavItem & { icon?: undefined } }) {
+function useActivo(href: string) {
   const pathname = usePathname();
-  const isActive = pathname === item.href || pathname.startsWith(item.href + "/");
-  const Icon = ICONS[item.iconName];
+  return pathname === href || pathname.startsWith(href + "/");
+}
 
+const clasesLink = (activo: boolean) =>
+  clsx(
+    "flex shrink-0 items-center gap-1.5 whitespace-nowrap rounded-full px-3 py-1.5 text-sm font-medium transition-colors",
+    activo ? "bg-accent/20 text-accent" : "text-slate-300 hover:bg-white/10 hover:text-white"
+  );
+
+export function HomeNavLink() {
+  const activo = useActivo("/") && usePathname() === "/";
   return (
-    <Link
-      href={item.href}
-      className={clsx(
-        "flex shrink-0 items-center gap-1.5 whitespace-nowrap rounded-full px-3 py-1.5 text-sm font-medium transition-colors",
-        isActive ? "bg-accent/20 text-accent" : "text-slate-300 hover:bg-white/10 hover:text-white"
-      )}
-    >
+    <Link href="/" className={clasesLink(activo)}>
+      <Home className="h-4 w-4" />
+      Inicio
+    </Link>
+  );
+}
+
+export function HorizontalNavLink({ item }: { item: NavItem }) {
+  const activo = useActivo(item.href);
+  const Icon = ICONS[item.iconName];
+  return (
+    <Link href={item.href} className={clasesLink(activo)}>
       <Icon className="h-4 w-4" />
       {item.label}
     </Link>
   );
 }
 
+export function UsuariosNavLink({ href, label }: { href: string; label: string }) {
+  const activo = useActivo(href);
+  return (
+    <Link href={href} className={clasesLink(activo)}>
+      <UserCog className="h-4 w-4" />
+      {label}
+    </Link>
+  );
+}
+
 export function ConfiguracionNavLink({ href, label }: { href: string; label: string }) {
   const pathname = usePathname();
-  const isActive = pathname.startsWith("/admin");
+  const activo = pathname.startsWith("/admin");
   return (
-    <Link
-      href={href}
-      className={clsx(
-        "flex shrink-0 items-center gap-1.5 whitespace-nowrap rounded-full px-3 py-1.5 text-sm font-medium transition-colors",
-        isActive ? "bg-accent/20 text-accent" : "text-slate-300 hover:bg-white/10 hover:text-white"
-      )}
-    >
+    <Link href={href} className={clasesLink(activo)}>
       <Settings className="h-4 w-4" />
       {label}
     </Link>
