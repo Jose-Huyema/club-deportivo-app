@@ -4,9 +4,9 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import clsx from "clsx";
 
+// Solo parámetros globales del sistema. Usuarios vive aparte, en /usuarios.
 const ADMIN_TABS = [
   { href: "/admin/general", label: "General" },
-  { href: "/admin/usuarios", label: "Usuarios" },
   { href: "/admin/categorias", label: "Categorías" },
   { href: "/admin/disciplinas", label: "Disciplinas" },
 ];
