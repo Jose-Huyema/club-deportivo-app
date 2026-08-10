@@ -41,10 +41,6 @@ export async function cambiarRol(userId: string, role: "admin" | "profe" | "oper
   return { error: null };
 }
 
-/**
- * Actualiza qué secciones puede ver un usuario (lo que arma "perfiles con
- * vistas seleccionadas"). Recibe la lista completa de vistas permitidas.
- */
 export async function actualizarVistas(userId: string, views: string[]) {
   const check = await assertAdminAction();
   if ("error" in check) return check;
@@ -57,11 +53,19 @@ export async function actualizarVistas(userId: string, views: string[]) {
   return { error: null };
 }
 
-/**
- * Habilita o deshabilita el acceso de un usuario (no borra nada, solo le
- * impide iniciar sesión). Usa la Admin API porque este estado vive en
- * auth.users, no en una tabla que podamos tocar con el cliente normal.
- */
+/** Actualiza el género de un usuario (para mostrar Profesor/Profesora). */
+export async function actualizarGenero(userId: string, genero: "M" | "F" | null) {
+  const check = await assertAdminAction();
+  if ("error" in check) return check;
+
+  const supabase = createClient();
+  const { error } = await supabase.from("profiles").update({ genero }).eq("id", userId);
+  if (error) return { error: "No se pudo guardar el género." };
+
+  revalidatePath("/usuarios");
+  return { error: null };
+}
+
 export async function alternarHabilitado(userId: string, habilitar: boolean) {
   const check = await assertAdminAction();
   if ("error" in check) return check;
@@ -72,7 +76,7 @@ export async function alternarHabilitado(userId: string, habilitar: boolean) {
 
   const admin = createAdminClient();
   const { error } = await admin.auth.admin.updateUserById(userId, {
-    ban_duration: habilitar ? "none" : "876000h", // ~100 años = deshabilitado indefinidamente
+    ban_duration: habilitar ? "none" : "876000h",
   });
 
   if (error) return { error: "No se pudo actualizar el estado del usuario." };
@@ -83,11 +87,15 @@ export async function alternarHabilitado(userId: string, habilitar: boolean) {
 
 /**
  * Invita a un usuario nuevo por email usando la Admin API de Supabase.
- * redirectTo le dice a Supabase adónde mandar a la persona DESPUÉS de que
- * el link del mail valide su token — a nuestra ruta /auth/callback, que a
- * su vez la manda a /actualizar-password para que elija su contraseña.
+ * role y genero viajan como metadata: el trigger handle_new_user los usa
+ * para crear el perfil ya con el rol, las vistas por defecto y el género.
  */
-export async function invitarUsuario(email: string, fullName: string, role: "admin" | "profe" | "operador") {
+export async function invitarUsuario(
+  email: string,
+  fullName: string,
+  role: "admin" | "profe" | "operador",
+  genero: "M" | "F" | ""
+) {
   const check = await assertAdminAction();
   if ("error" in check) return check;
 
@@ -104,7 +112,7 @@ export async function invitarUsuario(email: string, fullName: string, role: "adm
 
   const admin = createAdminClient();
   const { error } = await admin.auth.admin.inviteUserByEmail(email.trim(), {
-    data: { full_name: fullName.trim(), role },
+    data: { full_name: fullName.trim(), role, genero: genero || undefined },
     redirectTo: `${siteUrl}/auth/callback?next=/actualizar-password`,
   });
 
