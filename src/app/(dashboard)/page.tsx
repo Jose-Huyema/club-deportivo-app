@@ -2,7 +2,7 @@ import Link from "next/link";
 import {
   CalendarCheck, Users, Package, FileText, BarChart3, UserCog, Settings,
 } from "lucide-react";
-import { requireProfile } from "@/lib/data/profile";
+import { requireProfile, labelRol } from "@/lib/data/profile";
 import { getCategoriasParaAsistencia } from "@/lib/data/asistencia";
 import { Card } from "@/components/ui/Card";
 import { Badge } from "@/components/ui/Badge";
@@ -23,8 +23,6 @@ const LABELS: Record<string, string> = {
   documentos: "Documentos",
   reportes: "Reportes",
 };
-
-const LABEL_ROL: Record<string, string> = { admin: "Administrador", profe: "Profe", operador: "Operador" };
 
 function saludo() {
   const hora = new Date().getHours();
@@ -52,7 +50,7 @@ export default async function HomePage() {
         <Card className="mb-5 bg-primary text-white">
           <p className="text-sm text-slate-300">{saludo()},</p>
           <p className="text-lg font-bold">{profile.full_name}</p>
-          <p className="text-sm text-slate-300">{LABEL_ROL[profile.role]}</p>
+          <p className="text-sm text-slate-300">{labelRol(profile.role, profile.genero)}</p>
         </Card>
 
         <h2 className="mb-3 text-sm font-semibold text-slate-700">Tus disciplinas y categorías</h2>
@@ -108,7 +106,7 @@ export default async function HomePage() {
       <Card className="mb-6 bg-primary text-white">
         <p className="text-sm text-slate-300">{saludo()},</p>
         <p className="text-lg font-bold">{profile.full_name}</p>
-        <p className="text-sm text-slate-300">{LABEL_ROL[profile.role]}</p>
+        <p className="text-sm text-slate-300">{labelRol(profile.role, profile.genero)}</p>
       </Card>
 
       <h2 className="mb-3 text-sm font-semibold text-slate-700">Accesos directos</h2>
