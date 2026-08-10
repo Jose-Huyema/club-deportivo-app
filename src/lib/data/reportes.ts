@@ -31,7 +31,8 @@ export async function getReporteAlumnos(): Promise<FilaReporteAlumno[]> {
 export type FilaReporteProfesor = {
   full_name: string;
   email: string;
-  role: string;
+  role: "admin" | "profe" | "operador";
+  genero: "M" | "F" | null;
   categorias: string;
 };
 
@@ -39,7 +40,7 @@ export async function getReporteProfesores(): Promise<FilaReporteProfesor[]> {
   const supabase = createClient();
   const { data: perfiles } = await supabase
     .from("profiles")
-    .select("id, full_name, email, role")
+    .select("id, full_name, email, role, genero")
     .order("full_name");
 
   const { data: asignaciones } = await supabase
@@ -57,11 +58,11 @@ export async function getReporteProfesores(): Promise<FilaReporteProfesor[]> {
     full_name: p.full_name,
     email: p.email,
     role: p.role,
+    genero: p.genero,
     categorias: (mapa.get(p.id) ?? []).join(", "),
   }));
 }
 
-/** Convierte un array de objetos planos a texto CSV, escapando comillas y comas. */
 export function toCsv(rows: Record<string, any>[], headers: { key: string; label: string }[]): string {
   const escape = (val: unknown) => {
     const str = val === null || val === undefined ? "" : String(val);
