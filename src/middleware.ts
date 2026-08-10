@@ -9,7 +9,8 @@ const VIEW_BY_PREFIX: Record<string, string> = {
   "/reportes": "reportes",
 };
 
-const PROTECTED_PREFIXES = [...Object.keys(VIEW_BY_PREFIX), "/admin"];
+const ADMIN_ONLY_PREFIXES = ["/admin", "/usuarios"];
+const PROTECTED_PREFIXES = [...Object.keys(VIEW_BY_PREFIX), ...ADMIN_ONLY_PREFIXES];
 
 export async function middleware(request: NextRequest) {
   let response = NextResponse.next({ request: { headers: request.headers } });
@@ -54,19 +55,17 @@ export async function middleware(request: NextRequest) {
     const role = profile?.role;
     const allowedViews: string[] = profile?.allowed_views ?? [];
 
-    // /admin/* es exclusivo de admin, sin excepciones ni vistas personalizadas
-    if (path.startsWith("/admin") && role !== "admin") {
+    const esRutaAdminOnly = ADMIN_ONLY_PREFIXES.some((p) => path.startsWith(p));
+    if (esRutaAdminOnly && role !== "admin") {
       const url = request.nextUrl.clone();
-      url.pathname = "/asistencia";
+      url.pathname = "/";
       return NextResponse.redirect(url);
     }
 
-    // El resto de las secciones respeta las vistas permitidas del usuario
-    // (admin siempre pasa, tenga lo que tenga en allowed_views)
     const matchedPrefix = Object.keys(VIEW_BY_PREFIX).find((p) => path.startsWith(p));
     if (matchedPrefix && role !== "admin" && !allowedViews.includes(VIEW_BY_PREFIX[matchedPrefix])) {
       const url = request.nextUrl.clone();
-      url.pathname = "/asistencia";
+      url.pathname = "/";
       return NextResponse.redirect(url);
     }
   }
