@@ -1,9 +1,12 @@
 import { cache } from "react";
 import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
+import { puedeEditar, labelRol, type Role, type Genero } from "@/lib/roles";
 
-export type Role = "admin" | "profe" | "operador";
-export type Genero = "M" | "F" | null;
+// Re-exportados para no romper los imports existentes (@/lib/data/profile
+// seguía siendo el lugar de donde varias páginas los importaban).
+export { puedeEditar, labelRol };
+export type { Role, Genero };
 
 export type Profile = {
   id: string;
@@ -13,24 +16,6 @@ export type Profile = {
   allowed_views: string[];
   genero: Genero;
 };
-
-export function puedeEditar(role: Role) {
-  return role === "admin" || role === "operador";
-}
-
-/**
- * Etiqueta legible del rol. Para "profe" varía según género
- * (Profesor/Profesora); si no está cargado, usa "Profe" genérico.
- */
-export function labelRol(role: Role, genero?: Genero): string {
-  if (role === "profe") {
-    if (genero === "M") return "Profesor";
-    if (genero === "F") return "Profesora";
-    return "Profe";
-  }
-  if (role === "admin") return "Admin";
-  return "Operador";
-}
 
 /**
  * Trae el perfil UNA sola vez por request, sin importar cuántas veces se
