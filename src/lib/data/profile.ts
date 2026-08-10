@@ -3,6 +3,7 @@ import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
 
 export type Role = "admin" | "profe" | "operador";
+export type Genero = "M" | "F" | null;
 
 export type Profile = {
   id: string;
@@ -10,6 +11,7 @@ export type Profile = {
   full_name: string;
   role: Role;
   allowed_views: string[];
+  genero: Genero;
 };
 
 export function puedeEditar(role: Role) {
@@ -17,10 +19,23 @@ export function puedeEditar(role: Role) {
 }
 
 /**
+ * Etiqueta legible del rol. Para "profe" varía según género
+ * (Profesor/Profesora); si no está cargado, usa "Profe" genérico.
+ */
+export function labelRol(role: Role, genero?: Genero): string {
+  if (role === "profe") {
+    if (genero === "M") return "Profesor";
+    if (genero === "F") return "Profesora";
+    return "Profe";
+  }
+  if (role === "admin") return "Admin";
+  return "Operador";
+}
+
+/**
  * Trae el perfil UNA sola vez por request, sin importar cuántas veces se
  * llame (layout + page + componentes anidados). React.cache() memoiza el
- * resultado dentro del mismo ciclo de render — antes esto disparaba la
- * misma consulta 2-3 veces por navegación.
+ * resultado dentro del mismo ciclo de render.
  */
 const getCachedProfile = cache(async (): Promise<Profile | null> => {
   const supabase = createClient();
@@ -29,7 +44,7 @@ const getCachedProfile = cache(async (): Promise<Profile | null> => {
 
   const { data: profile, error } = await supabase
     .from("profiles")
-    .select("id, email, full_name, role, allowed_views")
+    .select("id, email, full_name, role, allowed_views, genero")
     .eq("id", data.user.id)
     .single();
 
@@ -37,9 +52,6 @@ const getCachedProfile = cache(async (): Promise<Profile | null> => {
   return profile as Profile;
 });
 
-/**
- * Obtiene el perfil del usuario logueado. Si no hay sesión, redirige a /login.
- */
 export async function requireProfile(): Promise<Profile> {
   const profile = await getCachedProfile();
   if (!profile) redirect("/login");
