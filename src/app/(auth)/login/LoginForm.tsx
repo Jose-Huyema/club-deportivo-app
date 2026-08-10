@@ -1,14 +1,12 @@
 "use client";
 
 import { useState, FormEvent } from "react";
-import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { Button } from "@/components/ui/Button";
 import { Input, Label, ErrorText } from "@/components/ui/FormField";
 import { Card } from "@/components/ui/Card";
 
 export function LoginForm() {
-  const router = useRouter();
   const supabase = createClient();
 
   const [email, setEmail] = useState("");
@@ -33,8 +31,10 @@ export function LoginForm() {
       return;
     }
 
-    router.push("/");
-    router.refresh();
+    // Navegación de página completa (no router.push) a propósito: así nos
+    // aseguramos de que el servidor reciba la cookie de sesión recién
+    // creada en esta misma request, sin condición de carrera.
+    window.location.href = "/";
   }
 
   return (
