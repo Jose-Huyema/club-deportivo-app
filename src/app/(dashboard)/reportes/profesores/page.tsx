@@ -1,10 +1,10 @@
 import Link from "next/link";
 import { ArrowLeft, Download } from "lucide-react";
-import { getReporteProfesores } from "@/lib/data/reportes";
+import { getReporteProfesores, toCsv } from "@/lib/data/reportes";
+import { labelRol } from "@/lib/data/profile";
 import { PrintButton } from "@/components/layout/PrintButton";
 import { Badge } from "@/components/ui/Badge";
 
-const LABEL_ROL: Record<string, string> = { admin: "Admin", profe: "Profe", operador: "Operador" };
 const TONE_ROL: Record<string, "success" | "warning" | "neutral"> = { admin: "success", profe: "neutral", operador: "warning" };
 
 export default async function ReporteProfesoresPage() {
@@ -44,7 +44,7 @@ export default async function ReporteProfesoresPage() {
               <tr key={i}>
                 <td className="px-3 py-2 font-medium text-slate-900">{u.full_name}</td>
                 <td className="px-3 py-2 text-slate-600">{u.email}</td>
-                <td className="px-3 py-2"><Badge tone={TONE_ROL[u.role] ?? "neutral"}>{LABEL_ROL[u.role] ?? u.role}</Badge></td>
+                <td className="px-3 py-2"><Badge tone={TONE_ROL[u.role] ?? "neutral"}>{labelRol(u.role, u.genero)}</Badge></td>
                 <td className="px-3 py-2 text-slate-600">{u.categorias || "—"}</td>
               </tr>
             ))}
