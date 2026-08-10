@@ -5,7 +5,7 @@ import clsx from "clsx";
 import { Card } from "@/components/ui/Card";
 import { Select } from "@/components/ui/FormField";
 import { Badge } from "@/components/ui/Badge";
-import { labelRol } from "@/lib/data/profile";
+import { labelRol } from "@/lib/roles";
 import type { ProfesorConCategorias, Categoria } from "@/lib/data/admin";
 import { toggleAsignacion, cambiarRol, actualizarVistas, alternarHabilitado, actualizarGenero } from "./actions";
 
