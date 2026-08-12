@@ -11,7 +11,7 @@ export function InvitarUsuarioForm() {
   const router = useRouter();
   const [email, setEmail] = useState("");
   const [fullName, setFullName] = useState("");
-  const [role, setRole] = useState<"profe" | "admin" | "operador">("profe");
+  const [role, setRole] = useState<"profe" | "admin" | "operador" | "portero">("profe");
   const [genero, setGenero] = useState<"M" | "F" | "">("");
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
@@ -50,9 +50,10 @@ export function InvitarUsuarioForm() {
         <div className="grid grid-cols-2 gap-3">
           <div>
             <Label htmlFor="role">Rol</Label>
-            <Select id="role" value={role} onChange={(e) => setRole(e.target.value as "profe" | "admin" | "operador")}>
+            <Select id="role" value={role} onChange={(e) => setRole(e.target.value as "profe" | "admin" | "operador" | "portero")}>
               <option value="profe">Profe</option>
               <option value="operador">Operador</option>
+              <option value="portero">Portero</option>
               <option value="admin">Admin</option>
             </Select>
           </div>
