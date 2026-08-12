@@ -29,7 +29,7 @@ export async function toggleAsignacion(professorId: string, categoryId: string, 
   return { error: null };
 }
 
-export async function cambiarRol(userId: string, role: "admin" | "profe" | "operador") {
+export async function cambiarRol(userId: string, role: "admin" | "profe" | "operador" | "portero") {
   const check = await assertAdminAction();
   if ("error" in check) return check;
 
@@ -53,7 +53,6 @@ export async function actualizarVistas(userId: string, views: string[]) {
   return { error: null };
 }
 
-/** Actualiza el género de un usuario (para mostrar Profesor/Profesora). */
 export async function actualizarGenero(userId: string, genero: "M" | "F" | null) {
   const check = await assertAdminAction();
   if ("error" in check) return check;
@@ -85,6 +84,72 @@ export async function alternarHabilitado(userId: string, habilitar: boolean) {
   return { error: null };
 }
 
+/** Cambia el email de login del usuario (en auth.users) y lo sincroniza en profiles. */
+export async function actualizarEmail(userId: string, nuevoEmail: string) {
+  const check = await assertAdminAction();
+  if ("error" in check) return check;
+
+  const email = nuevoEmail.trim().toLowerCase();
+  if (!email || !email.includes("@")) return { error: "Ingresá un email válido." };
+
+  const admin = createAdminClient();
+  const { error: authError } = await admin.auth.admin.updateUserById(userId, {
+    email,
+    email_confirm: true,
+  });
+  if (authError) {
+    const yaExiste = authError.message?.toLowerCase().includes("already");
+    return { error: yaExiste ? "Ese email ya está en uso por otro usuario." : "No se pudo cambiar el email." };
+  }
+
+  const supabase = createClient();
+  const { error: profileError } = await supabase.from("profiles").update({ email }).eq("id", userId);
+  if (profileError) return { error: "El email se cambió para iniciar sesión, pero no se pudo actualizar en el perfil." };
+
+  revalidatePath("/usuarios");
+  return { error: null };
+}
+
+/** Reenvía el mail de invitación (solo tiene efecto si la persona todavía no confirmó su cuenta). */
+export async function reenviarInvitacion(email: string) {
+  const check = await assertAdminAction();
+  if ("error" in check) return check;
+
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL;
+  if (!siteUrl) return { error: "Falta configurar NEXT_PUBLIC_SITE_URL en Vercel." };
+
+  const admin = createAdminClient();
+  const { error } = await admin.auth.admin.inviteUserByEmail(email, {
+    redirectTo: `${siteUrl}/auth/callback?next=/actualizar-password`,
+  });
+
+  if (error) {
+    const yaConfirmado = error.message?.toLowerCase().includes("already");
+    return {
+      error: yaConfirmado
+        ? "Este usuario ya confirmó su cuenta, no hace falta reenviar la invitación."
+        : "No se pudo reenviar la invitación.",
+    };
+  }
+
+  return { error: null };
+}
+
+/** Borra al usuario definitivamente (auth.users y, en cascada, su perfil). Irreversible. */
+export async function eliminarUsuario(userId: string) {
+  const check = await assertAdminAction();
+  if ("error" in check) return check;
+
+  if (userId === check.userId) return { error: "No podés eliminarte a vos mismo." };
+
+  const admin = createAdminClient();
+  const { error } = await admin.auth.admin.deleteUser(userId);
+  if (error) return { error: "No se pudo eliminar el usuario." };
+
+  revalidatePath("/usuarios");
+  return { error: null };
+}
+
 /**
  * Invita a un usuario nuevo por email usando la Admin API de Supabase.
  * role y genero viajan como metadata: el trigger handle_new_user los usa
@@ -93,7 +158,7 @@ export async function alternarHabilitado(userId: string, habilitar: boolean) {
 export async function invitarUsuario(
   email: string,
   fullName: string,
-  role: "admin" | "profe" | "operador",
+  role: "admin" | "profe" | "operador" | "portero",
   genero: "M" | "F" | ""
 ) {
   const check = await assertAdminAction();
