@@ -10,12 +10,9 @@ export type AlumnoResumen = {
 
 export async function getAlumnos(): Promise<AlumnoResumen[]> {
   const supabase = createClient();
-
   const { data, error } = await supabase
     .from("students")
-    .select(
-      "id, full_name, emergency_phone, is_active, enrollments(categories(name))"
-    )
+    .select("id, full_name, emergency_phone, is_active, enrollments(categories(name))")
     .order("full_name");
 
   if (error || !data) return [];
@@ -35,6 +32,7 @@ export type AlumnoDetalle = {
   birth_date: string | null;
   tutor_name: string | null;
   emergency_phone: string;
+  phone: string | null;
   medical_notes: string | null;
   is_active: boolean;
   dni: string | null;
@@ -53,7 +51,7 @@ export async function getAlumnoDetalle(studentId: string): Promise<AlumnoDetalle
   const { data: student, error } = await supabase
     .from("students")
     .select(
-      "id, full_name, birth_date, tutor_name, emergency_phone, medical_notes, is_active, dni, address, height_cm, weight_kg, clothing_size, enrollments(category_id, categories(name))"
+      "id, full_name, birth_date, tutor_name, emergency_phone, phone, medical_notes, is_active, dni, address, height_cm, weight_kg, clothing_size, enrollments(category_id, categories(name))"
     )
     .eq("id", studentId)
     .single();
@@ -79,6 +77,7 @@ export async function getAlumnoDetalle(studentId: string): Promise<AlumnoDetalle
     birth_date: student.birth_date,
     tutor_name: student.tutor_name,
     emergency_phone: student.emergency_phone,
+    phone: student.phone,
     medical_notes: student.medical_notes,
     is_active: student.is_active,
     dni: student.dni,
