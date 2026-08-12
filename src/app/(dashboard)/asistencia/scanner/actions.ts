@@ -1,7 +1,7 @@
 "use server";
 
 import { createClient } from "@/lib/supabase/server";
-import { assertEditorAction } from "@/lib/data/profile";
+import { assertRoleAction } from "@/lib/data/profile";
 import { revalidatePath } from "next/cache";
 
 async function buscarAlumnoPorCodigo(codigo: string) {
@@ -17,8 +17,6 @@ async function buscarAlumnoPorCodigo(codigo: string) {
     return data;
   }
 
-  // Si no viene con el formato del QR del carnet, probamos como si fuera
-  // un DNI (por si el lector escanea el código de barras del documento).
   const { data } = await supabase
     .from("students")
     .select("id, full_name, is_active")
@@ -28,7 +26,7 @@ async function buscarAlumnoPorCodigo(codigo: string) {
 }
 
 export async function registrarIngreso(codigo: string) {
-  const check = await assertEditorAction();
+  const check = await assertRoleAction(["admin", "operador", "portero"]);
   if ("error" in check) return { error: check.error, studentName: null };
 
   const student = await buscarAlumnoPorCodigo(codigo);
