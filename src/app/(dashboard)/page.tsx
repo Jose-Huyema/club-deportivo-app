@@ -1,11 +1,12 @@
 import Link from "next/link";
 import {
-  CalendarCheck, Users, Package, FileText, BarChart3, UserCog, Settings,
+  CalendarCheck, Users, Package, FileText, BarChart3, ScanLine, UserCog, Settings,
 } from "lucide-react";
 import { requireProfile, labelRol } from "@/lib/data/profile";
 import { getCategoriasParaAsistencia } from "@/lib/data/asistencia";
 import { Card } from "@/components/ui/Card";
 import { Badge } from "@/components/ui/Badge";
+import { Button } from "@/components/ui/Button";
 import { EmptyState } from "@/components/ui/EmptyState";
 
 const ICONOS: Record<string, typeof CalendarCheck> = {
@@ -14,6 +15,7 @@ const ICONOS: Record<string, typeof CalendarCheck> = {
   inventario: Package,
   documentos: FileText,
   reportes: BarChart3,
+  ingreso: ScanLine,
 };
 
 const LABELS: Record<string, string> = {
@@ -22,6 +24,16 @@ const LABELS: Record<string, string> = {
   inventario: "Inventario",
   documentos: "Documentos",
   reportes: "Reportes",
+  ingreso: "Control de ingreso",
+};
+
+const HREFS: Record<string, string> = {
+  asistencia: "/asistencia",
+  alumnos: "/alumnos",
+  inventario: "/inventario",
+  documentos: "/documentos",
+  reportes: "/reportes",
+  ingreso: "/asistencia/scanner",
 };
 
 function saludo() {
@@ -33,6 +45,26 @@ function saludo() {
 
 export default async function HomePage() {
   const profile = await requireProfile();
+
+  // Portero: solo le interesa el scanner de ingreso, así que es lo único
+  // que ve, bien grande, sin nada más alrededor.
+  if (profile.role === "portero") {
+    return (
+      <div>
+        <Card className="mb-6 bg-primary text-white dark:bg-slate-950">
+          <p className="text-sm text-slate-300">{saludo()},</p>
+          <p className="text-lg font-bold">{profile.full_name}</p>
+          <p className="text-sm text-slate-300">{labelRol(profile.role, profile.genero)}</p>
+        </Card>
+        <Link href="/asistencia/scanner">
+          <Button className="flex w-full flex-col items-center gap-2 py-8 text-base">
+            <ScanLine className="h-8 w-8" />
+            Registrar ingreso
+          </Button>
+        </Link>
+      </div>
+    );
+  }
 
   // El profe tiene una home distinta: perfil + sus disciplinas/categorías,
   // como acceso directo a tomar asistencia (que es su tarea principal).
@@ -47,13 +79,13 @@ export default async function HomePage() {
 
     return (
       <div>
-        <Card className="mb-5 bg-primary text-white">
+        <Card className="mb-5 bg-primary text-white dark:bg-slate-950">
           <p className="text-sm text-slate-300">{saludo()},</p>
           <p className="text-lg font-bold">{profile.full_name}</p>
           <p className="text-sm text-slate-300">{labelRol(profile.role, profile.genero)}</p>
         </Card>
 
-        <h2 className="mb-3 text-sm font-semibold text-slate-700">Tus disciplinas y categorías</h2>
+        <h2 className="mb-3 text-sm font-semibold text-slate-700 dark:text-slate-300">Tus disciplinas y categorías</h2>
 
         {categorias.length === 0 ? (
           <EmptyState
@@ -70,8 +102,8 @@ export default async function HomePage() {
                     <Link key={c.id} href={`/asistencia/${c.id}`}>
                       <Card className="flex items-center justify-between hover:shadow-md">
                         <div>
-                          <p className="font-semibold text-slate-900">{c.name}</p>
-                          {c.schedule && <p className="text-sm text-slate-500">{c.schedule}</p>}
+                          <p className="font-semibold text-slate-900 dark:text-slate-100">{c.name}</p>
+                          {c.schedule && <p className="text-sm text-slate-500 dark:text-slate-400">{c.schedule}</p>}
                         </div>
                         {c.ya_registrada_hoy ? (
                           <Badge tone="success">Hoy: registrada</Badge>
@@ -92,7 +124,7 @@ export default async function HomePage() {
 
   // Admin y operador: bienvenida + accesos directos a lo que tienen permitido.
   const accesos = [
-    ...profile.allowed_views.map((key) => ({ href: `/${key}`, label: LABELS[key], icon: ICONOS[key] })),
+    ...profile.allowed_views.map((key) => ({ href: HREFS[key] ?? `/${key}`, label: LABELS[key] ?? key, icon: ICONOS[key] ?? CalendarCheck })),
     ...(profile.role === "admin"
       ? [
           { href: "/usuarios", label: "Usuarios", icon: UserCog },
@@ -103,19 +135,19 @@ export default async function HomePage() {
 
   return (
     <div>
-      <Card className="mb-6 bg-primary text-white">
+      <Card className="mb-6 bg-primary text-white dark:bg-slate-950">
         <p className="text-sm text-slate-300">{saludo()},</p>
         <p className="text-lg font-bold">{profile.full_name}</p>
         <p className="text-sm text-slate-300">{labelRol(profile.role, profile.genero)}</p>
       </Card>
 
-      <h2 className="mb-3 text-sm font-semibold text-slate-700">Accesos directos</h2>
+      <h2 className="mb-3 text-sm font-semibold text-slate-700 dark:text-slate-300">Accesos directos</h2>
       <div className="grid grid-cols-2 gap-3">
         {accesos.map((a) => (
           <Link key={a.href} href={a.href}>
             <Card className="flex flex-col items-center gap-2 py-6 text-center hover:shadow-md">
               <a.icon className="h-6 w-6 text-accent" />
-              <span className="text-sm font-medium text-slate-900">{a.label}</span>
+              <span className="text-sm font-medium text-slate-900 dark:text-slate-100">{a.label}</span>
             </Card>
           </Link>
         ))}
