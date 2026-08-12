@@ -1,4 +1,5 @@
 import { createClient } from "@/lib/supabase/server";
+import type { Role } from "@/lib/roles";
 
 export type CategoriaConEstado = {
   id: string;
@@ -16,7 +17,7 @@ export type CategoriaConEstado = {
  */
 export async function getCategoriasParaAsistencia(
   userId: string,
-  role: "admin" | "profe" | "operador"
+  role: Role
 ): Promise<CategoriaConEstado[]> {
   const supabase = createClient();
   const today = new Date().toISOString().slice(0, 10);
