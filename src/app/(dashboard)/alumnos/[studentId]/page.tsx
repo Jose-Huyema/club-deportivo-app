@@ -31,8 +31,8 @@ export default async function AlumnoDetallePage({ params }: { params: { studentI
     <div>
       <div className="mb-4 flex items-start justify-between gap-3">
         <div>
-          <h1 className="text-xl font-bold text-primary">{alumno.full_name}</h1>
-          <p className="text-sm text-slate-500">
+          <h1 className="text-xl font-bold text-primary dark:text-white">{alumno.full_name}</h1>
+          <p className="text-sm text-slate-500 dark:text-slate-400">
             {alumno.categorias.length > 0 ? alumno.categorias.join(", ") : "Sin categoría asignada"}
           </p>
         </div>
@@ -53,52 +53,58 @@ export default async function AlumnoDetallePage({ params }: { params: { studentI
       <Card className="mb-4 space-y-2 text-sm">
         {alumno.dni && (
           <div className="flex justify-between">
-            <span className="text-slate-500">DNI</span>
-            <span className="font-medium text-slate-900">{alumno.dni}</span>
+            <span className="text-slate-500 dark:text-slate-400">DNI</span>
+            <span className="font-medium text-slate-900 dark:text-slate-100">{alumno.dni}</span>
           </div>
         )}
         {alumno.birth_date && (
           <div className="flex justify-between">
-            <span className="text-slate-500">Fecha de nacimiento</span>
-            <span className="font-medium text-slate-900">{alumno.birth_date}</span>
+            <span className="text-slate-500 dark:text-slate-400">Fecha de nacimiento</span>
+            <span className="font-medium text-slate-900 dark:text-slate-100">{alumno.birth_date}</span>
           </div>
         )}
         {alumno.address && (
           <div className="flex justify-between">
-            <span className="text-slate-500">Dirección</span>
-            <span className="font-medium text-slate-900">{alumno.address}</span>
+            <span className="text-slate-500 dark:text-slate-400">Dirección</span>
+            <span className="font-medium text-slate-900 dark:text-slate-100">{alumno.address}</span>
+          </div>
+        )}
+        {alumno.phone && (
+          <div className="flex justify-between">
+            <span className="text-slate-500 dark:text-slate-400">Teléfono personal</span>
+            <span className="font-medium text-slate-900 dark:text-slate-100">{alumno.phone}</span>
           </div>
         )}
         <div className="flex justify-between">
-          <span className="text-slate-500">Contacto de emergencia</span>
-          <span className="font-medium text-slate-900">{alumno.emergency_phone}</span>
+          <span className="text-slate-500 dark:text-slate-400">Contacto de emergencia</span>
+          <span className="font-medium text-slate-900 dark:text-slate-100">{alumno.emergency_phone}</span>
         </div>
         {alumno.tutor_name && (
           <div className="flex justify-between">
-            <span className="text-slate-500">Tutor/a</span>
-            <span className="font-medium text-slate-900">{alumno.tutor_name}</span>
+            <span className="text-slate-500 dark:text-slate-400">Tutor/a</span>
+            <span className="font-medium text-slate-900 dark:text-slate-100">{alumno.tutor_name}</span>
           </div>
         )}
         {alumno.medical_notes && (
-          <div className="border-t border-slate-100 pt-2">
-            <span className="block text-slate-500">Notas médicas</span>
-            <span className="font-medium text-slate-900">{alumno.medical_notes}</span>
+          <div className="border-t border-slate-100 pt-2 dark:border-slate-700">
+            <span className="block text-slate-500 dark:text-slate-400">Notas médicas</span>
+            <span className="font-medium text-slate-900 dark:text-slate-100">{alumno.medical_notes}</span>
           </div>
         )}
       </Card>
 
       {(alumno.height_cm || alumno.weight_kg || alumno.clothing_size) && (
         <Card className="mb-4">
-          <p className="mb-2 text-sm font-semibold text-slate-700">Medidas</p>
+          <p className="mb-2 text-sm font-semibold text-slate-700 dark:text-slate-300">Medidas</p>
           <div className="flex gap-4 text-sm">
             {alumno.height_cm && (
-              <div><span className="block text-slate-500">Altura</span><span className="font-medium text-slate-900">{alumno.height_cm} cm</span></div>
+              <div><span className="block text-slate-500 dark:text-slate-400">Altura</span><span className="font-medium text-slate-900 dark:text-slate-100">{alumno.height_cm} cm</span></div>
             )}
             {alumno.weight_kg && (
-              <div><span className="block text-slate-500">Peso</span><span className="font-medium text-slate-900">{alumno.weight_kg} kg</span></div>
+              <div><span className="block text-slate-500 dark:text-slate-400">Peso</span><span className="font-medium text-slate-900 dark:text-slate-100">{alumno.weight_kg} kg</span></div>
             )}
             {alumno.clothing_size && (
-              <div><span className="block text-slate-500">Talle</span><span className="font-medium text-slate-900">{alumno.clothing_size}</span></div>
+              <div><span className="block text-slate-500 dark:text-slate-400">Talle</span><span className="font-medium text-slate-900 dark:text-slate-100">{alumno.clothing_size}</span></div>
             )}
           </div>
         </Card>
@@ -106,12 +112,12 @@ export default async function AlumnoDetallePage({ params }: { params: { studentI
 
       {puedeEditarAlumno && categorias.length > 0 && (
         <Card className="mb-4">
-          <p className="mb-2 text-sm font-semibold text-slate-700">Categorías inscriptas</p>
+          <p className="mb-2 text-sm font-semibold text-slate-700 dark:text-slate-300">Categorías inscriptas</p>
           <CategoriasEditor studentId={alumno.id} categorias={categorias} categoriaIdsIniciales={alumno.categoria_ids} />
         </Card>
       )}
 
-      <h2 className="mb-2 text-sm font-semibold text-slate-700">Historial de asistencia</h2>
+      <h2 className="mb-2 text-sm font-semibold text-slate-700 dark:text-slate-300">Historial de asistencia</h2>
       {alumno.historial.length === 0 ? (
         <EmptyState title="Todavía no hay registros de asistencia" />
       ) : (
@@ -119,8 +125,8 @@ export default async function AlumnoDetallePage({ params }: { params: { studentI
           {alumno.historial.map((h, i) => (
             <Card key={i} className="flex items-center justify-between py-2.5">
               <div>
-                <p className="text-sm font-medium text-slate-900">{h.category_name}</p>
-                <p className="text-xs text-slate-500">{h.date}</p>
+                <p className="text-sm font-medium text-slate-900 dark:text-slate-100">{h.category_name}</p>
+                <p className="text-xs text-slate-500 dark:text-slate-400">{h.date}</p>
               </div>
               <Badge tone={TONE_POR_ESTADO[h.status] ?? "neutral"}>{h.status}</Badge>
             </Card>
