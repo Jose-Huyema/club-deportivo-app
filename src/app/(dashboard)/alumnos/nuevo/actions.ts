@@ -7,6 +7,7 @@ import { revalidatePath } from "next/cache";
 export async function crearAlumno(data: {
   fullName: string;
   emergencyPhone: string;
+  phone?: string;
   birthDate?: string;
   tutorName?: string;
   medicalNotes?: string;
@@ -31,6 +32,7 @@ export async function crearAlumno(data: {
     .insert({
       full_name: data.fullName.trim(),
       emergency_phone: data.emergencyPhone.trim(),
+      phone: data.phone?.trim() || null,
       birth_date: data.birthDate || null,
       tutor_name: data.tutorName?.trim() || null,
       medical_notes: data.medicalNotes?.trim() || null,
@@ -46,16 +48,10 @@ export async function crearAlumno(data: {
   if (error || !student) return { error: "No se pudo crear el alumno.", studentId: undefined };
 
   if (data.categoryIds.length > 0) {
-    const rows = data.categoryIds.map((categoryId) => ({
-      student_id: student.id,
-      category_id: categoryId,
-    }));
+    const rows = data.categoryIds.map((categoryId) => ({ student_id: student.id, category_id: categoryId }));
     const { error: enrollError } = await supabase.from("enrollments").insert(rows);
     if (enrollError) {
-      return {
-        error: "El alumno se creó pero no se pudo inscribirlo en las categorías elegidas.",
-        studentId: undefined,
-      };
+      return { error: "El alumno se creó pero no se pudo inscribirlo en las categorías elegidas.", studentId: undefined };
     }
   }
 
