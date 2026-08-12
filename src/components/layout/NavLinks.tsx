@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import clsx from "clsx";
-import { CalendarCheck, Users, Package, FileText, BarChart3, UserCog, Settings, Home } from "lucide-react";
+import { CalendarCheck, Users, Package, FileText, BarChart3, ScanLine, UserCog, Settings, Home } from "lucide-react";
 import type { NavItem, NavIconName } from "@/lib/nav-items";
 
 const ICONS: Record<NavIconName, typeof CalendarCheck> = {
@@ -12,6 +12,7 @@ const ICONS: Record<NavIconName, typeof CalendarCheck> = {
   inventario: Package,
   documentos: FileText,
   reportes: BarChart3,
+  ingreso: ScanLine,
 };
 
 function useActivo(href: string) {
@@ -26,9 +27,9 @@ const clasesLink = (activo: boolean) =>
   );
 
 export function HomeNavLink() {
-  const activo = useActivo("/") && usePathname() === "/";
+  const pathname = usePathname();
   return (
-    <Link href="/" className={clasesLink(activo)}>
+    <Link href="/" className={clasesLink(pathname === "/")}>
       <Home className="h-4 w-4" />
       Inicio
     </Link>
