@@ -1,6 +1,6 @@
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
-import type { Genero } from "@/lib/data/profile";
+import type { Genero, Role } from "@/lib/roles";
 
 export type Disciplina = { id: string; name: string; description: string | null };
 
@@ -32,11 +32,12 @@ export type ProfesorConCategorias = {
   id: string;
   full_name: string;
   email: string;
-  role: "admin" | "profe" | "operador";
+  role: Role;
   genero: Genero;
   allowed_views: string[];
   categoria_ids: string[];
   habilitado: boolean;
+  confirmado: boolean;
 };
 
 export async function getProfesores(): Promise<ProfesorConCategorias[]> {
@@ -58,6 +59,7 @@ export async function getProfesores(): Promise<ProfesorConCategorias[]> {
   });
 
   let baneados = new Set<string>();
+  let confirmados = new Set<string>();
   try {
     const admin = createAdminClient();
     const { data: usersData } = await admin.auth.admin.listUsers({ perPage: 1000 });
@@ -66,8 +68,11 @@ export async function getProfesores(): Promise<ProfesorConCategorias[]> {
         .filter((u) => u.banned_until && new Date(u.banned_until) > new Date())
         .map((u) => u.id)
     );
+    confirmados = new Set(
+      (usersData?.users ?? []).filter((u) => !!u.email_confirmed_at).map((u) => u.id)
+    );
   } catch {
-    // Si falla, asumimos que todos están habilitados en vez de romper la pantalla.
+    // Si falla, asumimos habilitado/confirmado en vez de romper la pantalla.
   }
 
   return (perfiles ?? []).map((p) => ({
@@ -75,5 +80,6 @@ export async function getProfesores(): Promise<ProfesorConCategorias[]> {
     allowed_views: p.allowed_views ?? [],
     categoria_ids: mapa.get(p.id) ?? [],
     habilitado: !baneados.has(p.id),
+    confirmado: confirmados.has(p.id),
   }));
 }
