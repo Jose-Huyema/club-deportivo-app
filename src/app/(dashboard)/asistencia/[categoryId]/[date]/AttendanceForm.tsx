@@ -7,7 +7,6 @@ import { Check, X, FileText, Lock, Unlock } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 import { Badge } from "@/components/ui/Badge";
-import { ScannerInput } from "@/components/ui/ScannerInput";
 import type { AlumnoParaAsistencia } from "@/lib/data/asistencia";
 import { finalizarAsistencia, reabrirAsistencia } from "./actions";
 
@@ -40,7 +39,6 @@ export function AttendanceForm({
   const [finalizada, setFinalizada] = useState(finalizadaInicial);
   const [isPending, startTransition] = useTransition();
   const [feedback, setFeedback] = useState<{ type: "success" | "error"; message: string } | null>(null);
-  const [scanFeedback, setScanFeedback] = useState<string | null>(null);
 
   const soloLectura = finalizada;
 
@@ -53,25 +51,6 @@ export function AttendanceForm({
         return { ...a, status: siguiente };
       })
     );
-  }
-
-  function handleScan(codigo: string) {
-    if (soloLectura) return;
-    const match = codigo.match(/^STUDENT:(.+)$/);
-    const idBuscado = match ? match[1] : null;
-    const dniBuscado = match ? null : codigo.trim();
-
-    const alumno = alumnos.find(
-      (a) => (idBuscado && a.student_id === idBuscado) || (dniBuscado && a.dni === dniBuscado)
-    );
-
-    if (!alumno) {
-      setScanFeedback("Ese carnet no corresponde a ningún alumno de esta categoría.");
-      return;
-    }
-
-    setAlumnos((prev) => prev.map((a) => (a.student_id === alumno.student_id ? { ...a, status: "presente" } : a)));
-    setScanFeedback(`${alumno.full_name} marcado presente.`);
   }
 
   function handleFinalizar() {
@@ -110,8 +89,8 @@ export function AttendanceForm({
   return (
     <div>
       {finalizada && (
-        <Card className="mb-4 flex items-center justify-between border-emerald-200 bg-emerald-50">
-          <span className="flex items-center gap-2 text-sm font-medium text-emerald-800">
+        <Card className="mb-4 flex items-center justify-between border-emerald-200 bg-emerald-50 dark:border-emerald-800 dark:bg-emerald-900/20">
+          <span className="flex items-center gap-2 text-sm font-medium text-emerald-800 dark:text-emerald-300">
             <Lock className="h-4 w-4" /> Asistencia finalizada — solo lectura
           </span>
           {esAdmin && (
@@ -122,15 +101,8 @@ export function AttendanceForm({
         </Card>
       )}
 
-      {!soloLectura && (
-        <Card className="mb-4">
-          <ScannerInput onScan={handleScan} placeholder="Escaneá el carnet para marcar presente…" />
-          {scanFeedback && <p className="mt-2 text-center text-xs text-slate-500">{scanFeedback}</p>}
-        </Card>
-      )}
-
       <div className="mb-3 flex items-center justify-between">
-        <p className="text-sm font-medium text-slate-600">{presentes} de {alumnos.length} presentes</p>
+        <p className="text-sm font-medium text-slate-600 dark:text-slate-300">{presentes} de {alumnos.length} presentes</p>
         {finalizada && <Badge tone="success">Finalizada</Badge>}
       </div>
 
