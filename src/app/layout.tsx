@@ -2,13 +2,13 @@ import type { Metadata, Viewport } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Club Social y Deportivo Alderetes",
+  title: "Club Deportivo",
   description: "Gestión de asistencia e inventario del club",
   manifest: "/manifest.json",
   appleWebApp: {
     capable: true,
     statusBarStyle: "default",
-    title: "Club Social y Deportivo Alderetes ",
+    title: "Club Deportivo",
   },
 };
 
@@ -18,13 +18,28 @@ export const viewport: Viewport = {
   initialScale: 1,
 };
 
+// Se ejecuta ANTES de que React pinte nada, para que no haya un parpadeo
+// de tema claro y después oscuro al cargar la página.
+const scriptTema = `
+  try {
+    const guardado = localStorage.getItem('theme');
+    const prefiereOscuro = window.matchMedia('(prefers-color-scheme: dark)').matches;
+    if (guardado === 'dark' || (!guardado && prefiereOscuro)) {
+      document.documentElement.classList.add('dark');
+    }
+  } catch (e) {}
+`;
+
 export default function RootLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
   return (
-    <html lang="es">
+    <html lang="es" suppressHydrationWarning>
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: scriptTema }} />
+      </head>
       <body>{children}</body>
     </html>
   );
