@@ -5,22 +5,17 @@ import { useRouter } from "next/navigation";
 import clsx from "clsx";
 import { Card } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
-import { Label, Input, Select, Textarea, ErrorText } from "@/components/ui/FormField";
+import { Label, Input, Textarea, ErrorText } from "@/components/ui/FormField";
 import type { Categoria, Disciplina } from "@/lib/data/admin";
 import { crearAlumno } from "./actions";
 
 const TALLES = ["XS", "S", "M", "L", "XL", "XXL"];
 
-export function NuevoAlumnoForm({
-  categorias,
-  disciplinas,
-}: {
-  categorias: Categoria[];
-  disciplinas: Disciplina[];
-}) {
+export function NuevoAlumnoForm({ categorias, disciplinas }: { categorias: Categoria[]; disciplinas: Disciplina[] }) {
   const router = useRouter();
   const [fullName, setFullName] = useState("");
   const [emergencyPhone, setEmergencyPhone] = useState("");
+  const [phone, setPhone] = useState("");
   const [birthDate, setBirthDate] = useState("");
   const [tutorName, setTutorName] = useState("");
   const [medicalNotes, setMedicalNotes] = useState("");
@@ -48,16 +43,8 @@ export function NuevoAlumnoForm({
 
     startTransition(async () => {
       const result = await crearAlumno({
-        fullName,
-        emergencyPhone,
-        birthDate,
-        tutorName,
-        medicalNotes,
-        dni,
-        address,
-        heightCm,
-        weightKg,
-        clothingSize,
+        fullName, emergencyPhone, phone, birthDate, tutorName, medicalNotes,
+        dni, address, heightCm, weightKg, clothingSize,
         categoryIds: Array.from(categoryIds),
       });
 
@@ -72,15 +59,13 @@ export function NuevoAlumnoForm({
   }
 
   const categoriasFiltradas =
-    disciplineFilter === "todas"
-      ? categorias
-      : categorias.filter((c) => c.discipline_id === disciplineFilter);
+    disciplineFilter === "todas" ? categorias : categorias.filter((c) => c.discipline_id === disciplineFilter);
 
   return (
     <Card>
       <form onSubmit={handleSubmit} className="space-y-5">
         <div>
-          <p className="mb-3 text-sm font-semibold text-slate-700">Datos personales</p>
+          <p className="mb-3 text-sm font-semibold text-slate-700 dark:text-slate-300">Datos personales</p>
           <div className="space-y-3">
             <div>
               <Label htmlFor="fullName">Nombre completo</Label>
@@ -100,15 +85,15 @@ export function NuevoAlumnoForm({
               <Label htmlFor="address">Dirección (opcional)</Label>
               <Input id="address" value={address} onChange={(e) => setAddress(e.target.value)} placeholder="Calle 123, Ciudad" />
             </div>
-            <div>
-              <Label htmlFor="emergencyPhone">Teléfono de emergencia</Label>
-              <Input
-                id="emergencyPhone"
-                value={emergencyPhone}
-                onChange={(e) => setEmergencyPhone(e.target.value)}
-                placeholder="11-2345-6789"
-                required
-              />
+            <div className="grid grid-cols-2 gap-3">
+              <div>
+                <Label htmlFor="phone">Teléfono personal (opcional)</Label>
+                <Input id="phone" value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="11-2345-6789" />
+              </div>
+              <div>
+                <Label htmlFor="emergencyPhone">Teléfono de emergencia</Label>
+                <Input id="emergencyPhone" value={emergencyPhone} onChange={(e) => setEmergencyPhone(e.target.value)} placeholder="11-2345-6789" required />
+              </div>
             </div>
             <div>
               <Label htmlFor="tutorName">Tutor/a (opcional)</Label>
@@ -116,18 +101,13 @@ export function NuevoAlumnoForm({
             </div>
             <div>
               <Label htmlFor="medicalNotes">Notas médicas (opcional)</Label>
-              <Textarea
-                id="medicalNotes"
-                value={medicalNotes}
-                onChange={(e) => setMedicalNotes(e.target.value)}
-                placeholder="Alergias, condiciones a tener en cuenta, etc."
-              />
+              <Textarea id="medicalNotes" value={medicalNotes} onChange={(e) => setMedicalNotes(e.target.value)} placeholder="Alergias, condiciones a tener en cuenta, etc." />
             </div>
           </div>
         </div>
 
-        <div className="border-t border-slate-100 pt-4">
-          <p className="mb-3 text-sm font-semibold text-slate-700">Medidas (opcional)</p>
+        <div className="border-t border-slate-100 pt-4 dark:border-slate-700">
+          <p className="mb-3 text-sm font-semibold text-slate-700 dark:text-slate-300">Medidas (opcional)</p>
           <div className="grid grid-cols-3 gap-3">
             <div>
               <Label htmlFor="heightCm">Altura (cm)</Label>
@@ -139,35 +119,45 @@ export function NuevoAlumnoForm({
             </div>
             <div>
               <Label htmlFor="clothingSize">Talle</Label>
-              <Select id="clothingSize" value={clothingSize} onChange={(e) => setClothingSize(e.target.value)}>
+              <select
+                id="clothingSize"
+                value={clothingSize}
+                onChange={(e) => setClothingSize(e.target.value)}
+                className="w-full rounded-xl border border-slate-300 px-3 py-2.5 text-sm focus:border-accent focus:outline-none focus:ring-2 focus:ring-accent/30 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-100"
+              >
                 <option value="">—</option>
                 {TALLES.map((t) => (
                   <option key={t} value={t}>{t}</option>
                 ))}
-              </Select>
+              </select>
             </div>
           </div>
         </div>
 
-        <div className="border-t border-slate-100 pt-4">
-          <p className="mb-3 text-sm font-semibold text-slate-700">Disciplina y categorías (opcional)</p>
+        <div className="border-t border-slate-100 pt-4 dark:border-slate-700">
+          <p className="mb-3 text-sm font-semibold text-slate-700 dark:text-slate-300">Disciplina y categorías (opcional)</p>
           {disciplinas.length === 0 ? (
-            <p className="text-sm text-slate-500">
+            <p className="text-sm text-slate-500 dark:text-slate-400">
               Todavía no hay disciplinas cargadas. Podés crear el alumno igual y asignarlo después desde su ficha.
             </p>
           ) : (
             <>
               <div className="mb-3">
                 <Label htmlFor="disciplineFilter">Disciplina</Label>
-                <Select id="disciplineFilter" value={disciplineFilter} onChange={(e) => setDisciplineFilter(e.target.value)}>
+                <select
+                  id="disciplineFilter"
+                  value={disciplineFilter}
+                  onChange={(e) => setDisciplineFilter(e.target.value)}
+                  className="w-full rounded-xl border border-slate-300 px-3 py-2.5 text-sm focus:border-accent focus:outline-none focus:ring-2 focus:ring-accent/30 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-100"
+                >
                   <option value="todas">Todas</option>
                   {disciplinas.map((d) => (
                     <option key={d.id} value={d.id}>{d.name}</option>
                   ))}
-                </Select>
+                </select>
               </div>
               {categoriasFiltradas.length === 0 ? (
-                <p className="text-sm text-slate-500">Esa disciplina todavía no tiene categorías creadas.</p>
+                <p className="text-sm text-slate-500 dark:text-slate-400">Esa disciplina todavía no tiene categorías creadas.</p>
               ) : (
                 <div className="flex flex-wrap gap-2">
                   {categoriasFiltradas.map((c) => {
@@ -181,7 +171,7 @@ export function NuevoAlumnoForm({
                           "rounded-full border px-3 py-1.5 text-xs font-medium transition-colors",
                           activa
                             ? "border-accent bg-accent/15 text-accent"
-                            : "border-slate-300 bg-white text-slate-600 hover:border-slate-400"
+                            : "border-slate-300 bg-white text-slate-600 hover:border-slate-400 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-300"
                         )}
                       >
                         {c.name}
