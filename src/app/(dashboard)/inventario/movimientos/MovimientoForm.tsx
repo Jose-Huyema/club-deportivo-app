@@ -10,10 +10,10 @@ import { registrarMovimiento } from "./actions";
 
 type Tipo = "ingreso" | "egreso" | "baja_desgaste";
 
-export function MovimientoForm({ items }: { items: ItemInventario[] }) {
+export function MovimientoForm({ items, soloEgresos }: { items: ItemInventario[]; soloEgresos: boolean }) {
   const router = useRouter();
   const [itemId, setItemId] = useState(items[0]?.id ?? "");
-  const [type, setType] = useState<Tipo>("ingreso");
+  const [type, setType] = useState<Tipo>(soloEgresos ? "egreso" : "ingreso");
   const [quantity, setQuantity] = useState("1");
   const [notes, setNotes] = useState("");
   const [error, setError] = useState<string | null>(null);
@@ -29,14 +29,13 @@ export function MovimientoForm({ items }: { items: ItemInventario[] }) {
       setError("Elegí un artículo.");
       return;
     }
+    if (soloEgresos && !notes.trim()) {
+      setError("El motivo es obligatorio.");
+      return;
+    }
 
     startTransition(async () => {
-      const result = await registrarMovimiento({
-        itemId,
-        type,
-        quantity: Number(quantity),
-        notes,
-      });
+      const result = await registrarMovimiento({ itemId, type, quantity: Number(quantity), notes });
       if (result.error) {
         setError(result.error);
       } else {
@@ -50,8 +49,10 @@ export function MovimientoForm({ items }: { items: ItemInventario[] }) {
 
   if (items.length === 0) {
     return (
-      <p className="text-sm text-slate-500">
-        No hay artículos cargados todavía. Agregalos desde el panel de Admin.
+      <p className="text-sm text-slate-500 dark:text-slate-400">
+        {soloEgresos
+          ? "No hay artículos cargados en tu disciplina todavía."
+          : "No hay artículos cargados todavía. Agregalos desde el panel de Admin."}
       </p>
     );
   }
@@ -70,39 +71,45 @@ export function MovimientoForm({ items }: { items: ItemInventario[] }) {
           </Select>
         </div>
 
-        <div>
-          <Label htmlFor="type">Tipo de movimiento</Label>
-          <Select id="type" value={type} onChange={(e) => setType(e.target.value as Tipo)}>
-            <option value="ingreso">Ingreso (compra o donación)</option>
-            <option value="egreso">Egreso (préstamo o uso)</option>
-            <option value="baja_desgaste">Baja por desgaste</option>
-          </Select>
-        </div>
+        {!soloEgresos && (
+          <div>
+            <Label htmlFor="type">Tipo de movimiento</Label>
+            <Select id="type" value={type} onChange={(e) => setType(e.target.value as Tipo)}>
+              <option value="ingreso">Ingreso (compra o donación)</option>
+              <option value="egreso">Egreso (préstamo o uso)</option>
+              <option value="baja_desgaste">Baja por desgaste</option>
+            </Select>
+          </div>
+        )}
+
+        {soloEgresos && (
+          <div>
+            <Label htmlFor="type">Motivo del movimiento</Label>
+            <Select id="type" value={type} onChange={(e) => setType(e.target.value as Tipo)}>
+              <option value="egreso">Egreso (préstamo o uso)</option>
+              <option value="baja_desgaste">Baja por desgaste</option>
+            </Select>
+          </div>
+        )}
 
         <div>
           <Label htmlFor="quantity">Cantidad</Label>
-          <Input
-            id="quantity"
-            type="number"
-            min={1}
-            value={quantity}
-            onChange={(e) => setQuantity(e.target.value)}
-            required
-          />
+          <Input id="quantity" type="number" min={1} value={quantity} onChange={(e) => setQuantity(e.target.value)} required />
         </div>
 
         <div>
-          <Label htmlFor="notes">Notas (opcional)</Label>
+          <Label htmlFor="notes">{soloEgresos ? "Motivo (obligatorio)" : "Notas (opcional)"}</Label>
           <Textarea
             id="notes"
             value={notes}
             onChange={(e) => setNotes(e.target.value)}
-            placeholder="Ej: compra para categoría infantil"
+            placeholder={soloEgresos ? "Ej: se rompieron 2 pecheras en el entrenamiento" : "Ej: compra para categoría infantil"}
+            required={soloEgresos}
           />
         </div>
 
         <ErrorText>{error}</ErrorText>
-        {success && <p className="text-sm font-medium text-emerald-700">Movimiento registrado.</p>}
+        {success && <p className="text-sm font-medium text-emerald-700 dark:text-emerald-400">Movimiento registrado.</p>}
 
         <Button type="submit" className="w-full" loading={isPending}>
           Registrar movimiento
