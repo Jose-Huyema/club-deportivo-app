@@ -3,16 +3,17 @@ import { createClient } from "@/lib/supabase/server";
 import type { EmailOtpType } from "@supabase/supabase-js";
 
 /**
- * Ruta a la que Supabase redirige después de validar un link de invitación,
- * recuperación de contraseña, o magic link. Soporta los dos formatos que
- * puede usar Supabase (code o token_hash) según la configuración del proyecto.
+ * Ruta a la que Supabase redirige después de validar un login (Google,
+ * magic link, invitación por contraseña, recuperación). Por defecto manda
+ * a "/" — el flujo de invitación por contraseña pisa esto explícitamente
+ * con ?next=/actualizar-password.
  */
 export async function GET(request: Request) {
   const { searchParams, origin } = new URL(request.url);
   const code = searchParams.get("code");
   const token_hash = searchParams.get("token_hash");
   const type = searchParams.get("type") as EmailOtpType | null;
-  const next = searchParams.get("next") ?? "/actualizar-password";
+  const next = searchParams.get("next") ?? "/";
 
   const supabase = createClient();
 
