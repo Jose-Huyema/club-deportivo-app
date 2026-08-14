@@ -151,6 +151,57 @@ export async function eliminarUsuario(userId: string) {
 }
 
 /**
+ * Autoriza un email de Gmail a entrar con Google: apenas esa persona
+ * inicie sesión con esa cuenta, el trigger de la base le crea el perfil
+ * ya con este rol/vistas. No se manda ningún mail desde acá — el "aviso"
+ * se lo das vos por fuera (WhatsApp, en persona, etc.), decile que entre
+ * a la app y toque "Continuar con Google".
+ */
+export async function autorizarGoogle(
+  email: string,
+  role: "admin" | "profe" | "operador" | "portero",
+  genero: "M" | "F" | ""
+) {
+  const check = await assertAdminAction();
+  if ("error" in check) return check;
+
+  const emailLimpio = email.trim().toLowerCase();
+  if (!emailLimpio || !emailLimpio.includes("@")) return { error: "Ingresá un email válido." };
+
+  const allowedViews =
+    role === "admin" ? ["asistencia", "alumnos", "inventario", "documentos", "reportes"]
+    : role === "operador" ? ["alumnos", "documentos", "reportes"]
+    : role === "portero" ? ["ingreso"]
+    : ["asistencia", "alumnos", "inventario"];
+
+  const supabase = createClient();
+  const { error } = await supabase.from("invited_emails").upsert({
+    email: emailLimpio,
+    role,
+    genero: genero || null,
+    allowed_views: allowedViews,
+    invited_by: check.userId,
+  });
+
+  if (error) return { error: "No se pudo autorizar el email." };
+
+  revalidatePath("/usuarios");
+  return { error: null };
+}
+
+export async function cancelarAutorizacionPendiente(email: string) {
+  const check = await assertAdminAction();
+  if ("error" in check) return check;
+
+  const supabase = createClient();
+  const { error } = await supabase.from("invited_emails").delete().eq("email", email);
+  if (error) return { error: "No se pudo cancelar." };
+
+  revalidatePath("/usuarios");
+  return { error: null };
+}
+
+/**
  * Invita a un usuario nuevo por email usando la Admin API de Supabase.
  * role y genero viajan como metadata: el trigger handle_new_user los usa
  * para crear el perfil ya con el rol, las vistas por defecto y el género.
