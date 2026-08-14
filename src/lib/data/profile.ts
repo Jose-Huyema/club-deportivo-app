@@ -3,8 +3,6 @@ import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
 import { puedeEditar, labelRol, type Role, type Genero } from "@/lib/roles";
 
-// Re-exportados para no romper los imports existentes (@/lib/data/profile
-// seguía siendo el lugar de donde varias páginas los importaban).
 export { puedeEditar, labelRol };
 export type { Role, Genero };
 
@@ -15,13 +13,9 @@ export type Profile = {
   role: Role;
   allowed_views: string[];
   genero: Genero;
+  autorizado: boolean;
 };
 
-/**
- * Trae el perfil UNA sola vez por request, sin importar cuántas veces se
- * llame (layout + page + componentes anidados). React.cache() memoiza el
- * resultado dentro del mismo ciclo de render.
- */
 const getCachedProfile = cache(async (): Promise<Profile | null> => {
   const supabase = createClient();
   const { data, error: userError } = await supabase.auth.getUser();
@@ -29,7 +23,7 @@ const getCachedProfile = cache(async (): Promise<Profile | null> => {
 
   const { data: profile, error } = await supabase
     .from("profiles")
-    .select("id, email, full_name, role, allowed_views, genero")
+    .select("id, email, full_name, role, allowed_views, genero, autorizado")
     .eq("id", data.user.id)
     .single();
 
@@ -37,9 +31,21 @@ const getCachedProfile = cache(async (): Promise<Profile | null> => {
   return profile as Profile;
 });
 
+/**
+ * Trae el perfil UNA sola vez por request (React.cache). Si el usuario
+ * inició sesión con un Gmail que nadie autorizó, lo desloguea y lo manda
+ * a /login con un mensaje, en vez de dejarlo pasar sin permisos.
+ */
 export async function requireProfile(): Promise<Profile> {
   const profile = await getCachedProfile();
   if (!profile) redirect("/login");
+
+  if (!profile.autorizado) {
+    const supabase = createClient();
+    await supabase.auth.signOut();
+    redirect("/login?error=no_autorizado");
+  }
+
   return profile;
 }
 
@@ -55,10 +61,6 @@ export async function requireEditor(): Promise<Profile> {
   return profile;
 }
 
-/**
- * Chequeo de rol pensado para usarse DENTRO de Server Actions (no redirige,
- * devuelve un resultado de error para que la action lo propague al formulario).
- */
 export async function assertRoleAction(
   allowedRoles: Role[]
 ): Promise<{ userId: string; role: Role } | { error: string }> {
@@ -69,13 +71,12 @@ export async function assertRoleAction(
 
   const { data: profile } = await supabase
     .from("profiles")
-    .select("role")
+    .select("role, autorizado")
     .eq("id", data.user.id)
     .single();
 
-  if (!profile || !allowedRoles.includes(profile.role as Role)) {
-    return { error: "No tenés permisos para esta acción." };
-  }
+  if (!profile?.autorizado) return { error: "Tu cuenta no está autorizada." };
+  if (!allowedRoles.includes(profile.role as Role)) return { error: "No tenés permisos para esta acción." };
 
   return { userId: data.user.id, role: profile.role as Role };
 }
