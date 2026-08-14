@@ -1,6 +1,6 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
-import { CreditCard } from "lucide-react";
+import { CreditCard, FileText } from "lucide-react";
 import { getAlumnoDetalle } from "@/lib/data/alumnos";
 import { getCategorias } from "@/lib/data/admin";
 import { requireProfile, puedeEditar } from "@/lib/data/profile";
@@ -43,12 +43,22 @@ export default async function AlumnoDetallePage({ params }: { params: { studentI
         )}
       </div>
 
-      <Link href={`/alumnos/${alumno.id}/carnet`} className="mb-4 block">
-        <Button variant="secondary" className="w-full">
-          <CreditCard className="h-4 w-4" />
-          Ver / imprimir carnet
-        </Button>
-      </Link>
+      <div className="mb-4 grid grid-cols-2 gap-2">
+        <Link href={`/alumnos/${alumno.id}/carnet`}>
+          <Button variant="secondary" className="w-full">
+            <CreditCard className="h-4 w-4" />
+            Carnet
+          </Button>
+        </Link>
+        {puedeEditarAlumno && (
+          <Link href={`/documentos/${alumno.id}`}>
+            <Button variant="secondary" className="w-full">
+              <FileText className="h-4 w-4" />
+              Documentos
+            </Button>
+          </Link>
+        )}
+      </div>
 
       <Card className="mb-4 space-y-2 text-sm">
         {alumno.dni && (
