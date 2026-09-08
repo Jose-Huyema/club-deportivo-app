@@ -2,6 +2,7 @@ import { createServerClient, type CookieOptions } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 
 const VIEW_BY_PREFIX: Record<string, string> = {
+  "/asistencia/scanner": "ingreso",
   "/asistencia": "asistencia",
   "/alumnos": "alumnos",
   "/inventario": "inventario",
@@ -62,7 +63,7 @@ export async function middleware(request: NextRequest) {
       return NextResponse.redirect(url);
     }
 
-    const matchedPrefix = Object.keys(VIEW_BY_PREFIX).find((p) => path.startsWith(p));
+    const matchedPrefix = Object.keys(VIEW_BY_PREFIX).sort((a, b) => b.length - a.length).find((p) => path.startsWith(p));
     if (matchedPrefix && role !== "admin" && !allowedViews.includes(VIEW_BY_PREFIX[matchedPrefix])) {
       const url = request.nextUrl.clone();
       url.pathname = "/";
@@ -79,8 +80,3 @@ export const config = {
   ],
 };
 
-export const config = {
-  matcher: [
-    "/((?!_next/static|_next/image|favicon.ico|icons|manifest.json|logo.png|watermark.png).*)",
-  ],
-};
