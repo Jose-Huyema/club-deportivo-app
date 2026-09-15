@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { Card } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
 import { Label, Select, ErrorText } from "@/components/ui/FormField";
-import { TIPOS_DOCUMENTO } from "@/lib/data/documentos";
+import { TIPOS_DOCUMENTO } from "@/lib/documento-types";
 import { subirDocumento } from "./actions";
 
 export function UploadDocumentoForm({ studentId }: { studentId: string }) {

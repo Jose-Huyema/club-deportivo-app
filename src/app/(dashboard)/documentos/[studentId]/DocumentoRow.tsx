@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { Download, Trash2 } from "lucide-react";
 import { Card } from "@/components/ui/Card";
 import { Badge } from "@/components/ui/Badge";
-import { TIPOS_DOCUMENTO, type DocumentoAlumno } from "@/lib/data/documentos";
+import { TIPOS_DOCUMENTO, type DocumentoAlumno } from "@/lib/documento-types";
 import { eliminarDocumento } from "./actions";
 
 export function DocumentoRow({ documento, studentId }: { documento: DocumentoAlumno; studentId: string }) {
