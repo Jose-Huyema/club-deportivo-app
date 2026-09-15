@@ -1,21 +1,8 @@
 import { createClient } from "@/lib/supabase/server";
+import type { DocumentoAlumno } from "@/lib/documento-types";
 
-export const TIPOS_DOCUMENTO = [
-  { value: "seguro", label: "Seguro" },
-  { value: "foto_dni", label: "Foto de DNI" },
-  { value: "autorizacion", label: "Autorización" },
-  { value: "comunicado", label: "Comunicado" },
-  { value: "otro", label: "Otro" },
-] as const;
-
-export type DocumentoAlumno = {
-  id: string;
-  tipo: string;
-  file_name: string;
-  file_path: string;
-  created_at: string;
-  uploaded_by_name: string | null;
-};
+export type { DocumentoAlumno };
+export { TIPOS_DOCUMENTO } from "@/lib/documento-types";
 
 export async function getDocumentosDeAlumno(studentId: string): Promise<DocumentoAlumno[]> {
   const supabase = createClient();
