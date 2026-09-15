@@ -1,5 +1,5 @@
 import { ButtonHTMLAttributes, forwardRef } from "react";
-import clsx from "clsx";
+import { cn } from "@/lib/utils";
 
 type Variant = "primary" | "secondary" | "danger" | "ghost";
 
@@ -21,7 +21,7 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
       <button
         ref={ref}
         disabled={disabled || loading}
-        className={clsx(
+        className={cn(
           "inline-flex items-center justify-center gap-2 rounded-xl px-4 py-3 text-sm font-semibold transition-colors",
           "disabled:cursor-not-allowed disabled:opacity-50",
           "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2",

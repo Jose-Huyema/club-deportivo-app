@@ -4,7 +4,7 @@ const DISCIPLINE_PALETTE = [
   "#1D7A73", // teal
   "#3A5BA0", // indigo
   "#8B5E3C", // tierra
-  "#6E1F2E", // bordó (marca)
+  "#5C121F", // granate (marca)
   "#4F7A28", // verde oliva
   "#7A4F91", // violeta
 ] as const;
