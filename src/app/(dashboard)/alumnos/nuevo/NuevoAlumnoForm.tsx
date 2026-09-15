@@ -6,6 +6,8 @@ import clsx from "clsx";
 import { Card } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
 import { Label, Input, Textarea, ErrorText } from "@/components/ui/FormField";
+import { CollapsibleSection } from "@/components/ui/CollapsibleSection";
+import { StickyFormBar, FormBottomSpacer } from "@/components/ui/StickyFormBar";
 import type { Categoria, Disciplina } from "@/lib/data/admin";
 import { crearAlumno } from "./actions";
 
@@ -106,8 +108,7 @@ export function NuevoAlumnoForm({ categorias, disciplinas }: { categorias: Categ
           </div>
         </div>
 
-        <div className="border-t border-slate-100 pt-4 dark:border-slate-700">
-          <p className="mb-3 text-sm font-semibold text-slate-700 dark:text-slate-300">Medidas (opcional)</p>
+        <CollapsibleSection title="Medidas (opcional)">
           <div className="grid grid-cols-3 gap-3">
             <div>
               <Label htmlFor="heightCm">Altura (cm)</Label>
@@ -132,10 +133,9 @@ export function NuevoAlumnoForm({ categorias, disciplinas }: { categorias: Categ
               </select>
             </div>
           </div>
-        </div>
+        </CollapsibleSection>
 
-        <div className="border-t border-slate-100 pt-4 dark:border-slate-700">
-          <p className="mb-3 text-sm font-semibold text-slate-700 dark:text-slate-300">Disciplina y categorías (opcional)</p>
+        <CollapsibleSection title="Disciplina y categorías (opcional)">
           {disciplinas.length === 0 ? (
             <p className="text-sm text-slate-500 dark:text-slate-400">
               Todavía no hay disciplinas cargadas. Podés crear el alumno igual y asignarlo después desde su ficha.
@@ -182,12 +182,15 @@ export function NuevoAlumnoForm({ categorias, disciplinas }: { categorias: Categ
               )}
             </>
           )}
-        </div>
+        </CollapsibleSection>
 
-        <ErrorText>{error}</ErrorText>
-        <Button type="submit" className="w-full" loading={isPending}>
-          Crear alumno
-        </Button>
+        <FormBottomSpacer />
+        <StickyFormBar>
+          <ErrorText>{error}</ErrorText>
+          <Button type="submit" className="w-full" loading={isPending}>
+            Crear alumno
+          </Button>
+        </StickyFormBar>
       </form>
     </Card>
   );

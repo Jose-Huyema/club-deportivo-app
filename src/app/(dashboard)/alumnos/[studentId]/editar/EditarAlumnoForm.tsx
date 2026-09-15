@@ -5,6 +5,8 @@ import { useRouter } from "next/navigation";
 import { Card } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
 import { Label, Input, Select, Textarea, ErrorText } from "@/components/ui/FormField";
+import { CollapsibleSection } from "@/components/ui/CollapsibleSection";
+import { StickyFormBar, FormBottomSpacer } from "@/components/ui/StickyFormBar";
 import type { AlumnoDetalle } from "@/lib/data/alumnos";
 import { actualizarAlumno } from "./actions";
 
@@ -93,8 +95,7 @@ export function EditarAlumnoForm({ alumno }: { alumno: AlumnoDetalle }) {
           </div>
         </div>
 
-        <div className="border-t border-slate-100 pt-4 dark:border-slate-700">
-          <p className="mb-3 text-sm font-semibold text-slate-700 dark:text-slate-300">Medidas</p>
+        <CollapsibleSection title="Medidas" defaultOpen>
           <div className="grid grid-cols-3 gap-3">
             <div>
               <Label htmlFor="heightCm">Altura (cm)</Label>
@@ -114,13 +115,16 @@ export function EditarAlumnoForm({ alumno }: { alumno: AlumnoDetalle }) {
               </Select>
             </div>
           </div>
-        </div>
+        </CollapsibleSection>
 
-        <ErrorText>{error}</ErrorText>
-        {success && <p className="text-sm font-medium text-emerald-700 dark:text-emerald-400">Guardado.</p>}
-        <Button type="submit" className="w-full" loading={isPending}>
-          Guardar cambios
-        </Button>
+        <FormBottomSpacer />
+        <StickyFormBar>
+          <ErrorText>{error}</ErrorText>
+          {success && <p className="mb-2 text-sm font-medium text-emerald-700 dark:text-emerald-400">Guardado.</p>}
+          <Button type="submit" className="w-full" loading={isPending}>
+            Guardar cambios
+          </Button>
+        </StickyFormBar>
       </form>
     </Card>
   );
