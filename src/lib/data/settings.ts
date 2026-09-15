@@ -1,3 +1,4 @@
+import { unstable_cache } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 
 export type AppSettings = {
@@ -10,7 +11,7 @@ const DEFAULTS: AppSettings = {
   club_subtitle: "Asistencia e inventario",
 };
 
-export async function getAppSettings(): Promise<AppSettings> {
+async function fetchAppSettings(): Promise<AppSettings> {
   const supabase = createClient();
   const { data, error } = await supabase
     .from("app_settings")
@@ -21,3 +22,14 @@ export async function getAppSettings(): Promise<AppSettings> {
   if (error || !data) return DEFAULTS;
   return data;
 }
+
+/**
+ * El nombre del club casi nunca cambia, así que en vez de consultar la
+ * base en cada navegación (login, cada página del dashboard, cada carnet),
+ * se guarda en caché por 5 minutos. Cuando el admin lo edita en
+ * Configuración, se invalida al instante con revalidateTag("app-settings").
+ */
+export const getAppSettings = unstable_cache(fetchAppSettings, ["app-settings"], {
+  tags: ["app-settings"],
+  revalidate: 300,
+});

@@ -1,6 +1,6 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
-import { CreditCard, FileText } from "lucide-react";
+import { CreditCard, FileText, Pencil } from "lucide-react";
 import { getAlumnoDetalle } from "@/lib/data/alumnos";
 import { getCategorias } from "@/lib/data/admin";
 import { requireProfile, puedeEditar } from "@/lib/data/profile";
@@ -43,7 +43,7 @@ export default async function AlumnoDetallePage({ params }: { params: { studentI
         )}
       </div>
 
-      <div className="mb-4 grid grid-cols-2 gap-2">
+      <div className="mb-4 grid grid-cols-3 gap-2">
         <Link href={`/alumnos/${alumno.id}/carnet`}>
           <Button variant="secondary" className="w-full">
             <CreditCard className="h-4 w-4" />
@@ -51,12 +51,20 @@ export default async function AlumnoDetallePage({ params }: { params: { studentI
           </Button>
         </Link>
         {puedeEditarAlumno && (
-          <Link href={`/documentos/${alumno.id}`}>
-            <Button variant="secondary" className="w-full">
-              <FileText className="h-4 w-4" />
-              Documentos
-            </Button>
-          </Link>
+          <>
+            <Link href={`/documentos/${alumno.id}`}>
+              <Button variant="secondary" className="w-full">
+                <FileText className="h-4 w-4" />
+                Documentos
+              </Button>
+            </Link>
+            <Link href={`/alumnos/${alumno.id}/editar`}>
+              <Button variant="secondary" className="w-full">
+                <Pencil className="h-4 w-4" />
+                Editar
+              </Button>
+            </Link>
+          </>
         )}
       </div>
 

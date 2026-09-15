@@ -2,7 +2,7 @@
 
 import { createClient } from "@/lib/supabase/server";
 import { assertAdminAction } from "@/lib/data/profile";
-import { revalidatePath } from "next/cache";
+import { revalidatePath, revalidateTag } from "next/cache";
 
 export async function actualizarConfiguracion(clubName: string, clubSubtitle: string) {
   const check = await assertAdminAction();
@@ -18,6 +18,9 @@ export async function actualizarConfiguracion(clubName: string, clubSubtitle: st
 
   if (error) return { error: "No se pudo guardar la configuración." };
 
+  // Invalida la caché de 5 minutos de getAppSettings al instante, para que
+  // el cambio se vea ya mismo en vez de esperar a que expire sola.
+  revalidateTag("app-settings");
   revalidatePath("/", "layout");
   return { error: null };
 }
