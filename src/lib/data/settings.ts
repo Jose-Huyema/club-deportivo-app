@@ -1,5 +1,5 @@
 import { unstable_cache } from "next/cache";
-import { createClient } from "@/lib/supabase/server";
+import { createClient as createSupabaseClient } from "@supabase/supabase-js";
 
 export type AppSettings = {
   club_name: string;
@@ -12,7 +12,16 @@ const DEFAULTS: AppSettings = {
 };
 
 async function fetchAppSettings(): Promise<AppSettings> {
-  const supabase = createClient();
+  // OJO: esta función se envuelve en unstable_cache, que NO permite usar
+  // cookies()/headers() de la request (Next.js lo prohíbe). Por eso acá
+  // usamos un cliente de Supabase "pelado", sin cookies de sesión — no
+  // hace falta ninguna, porque app_settings tiene lectura pública
+  // (política RLS: USING (true)).
+  const supabase = createSupabaseClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+  );
+
   const { data, error } = await supabase
     .from("app_settings")
     .select("club_name, club_subtitle")
@@ -25,9 +34,9 @@ async function fetchAppSettings(): Promise<AppSettings> {
 
 /**
  * El nombre del club casi nunca cambia, así que en vez de consultar la
- * base en cada navegación (login, cada página del dashboard, cada carnet),
- * se guarda en caché por 5 minutos. Cuando el admin lo edita en
- * Configuración, se invalida al instante con revalidateTag("app-settings").
+ * base en cada navegación se guarda en caché por 5 minutos. Cuando el
+ * admin lo edita en Configuración, se invalida al instante con
+ * revalidateTag("app-settings").
  */
 export const getAppSettings = unstable_cache(fetchAppSettings, ["app-settings"], {
   tags: ["app-settings"],
