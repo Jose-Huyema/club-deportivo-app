@@ -30,7 +30,7 @@ export default async function AlumnoDetallePage({ params }: { params: { studentI
     <div>
       <div className="mb-4 flex items-start justify-between gap-3">
         <div>
-          <h1 className="text-xl font-bold text-primary dark:text-white">{alumno.full_name}</h1>
+          <h1 className="font-display text-2xl font-bold tracking-tight text-primary dark:text-white">{alumno.full_name}</h1>
           <p className="text-sm text-slate-500 dark:text-slate-400">
             {alumno.categorias.length > 0 ? alumno.categorias.join(", ") : "Sin categoría asignada"}
           </p>

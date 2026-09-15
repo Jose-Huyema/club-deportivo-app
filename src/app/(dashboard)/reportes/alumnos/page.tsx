@@ -23,7 +23,7 @@ export default async function ReporteAlumnosPage() {
         </div>
       </div>
 
-      <h1 className="mb-1 text-xl font-bold text-primary">Reporte de alumnos</h1>
+      <h1 className="mb-1 font-display text-2xl font-bold tracking-tight text-primary">Reporte de alumnos</h1>
       <p className="mb-4 text-sm text-slate-500">{alumnos.length} alumnos</p>
 
       <div className="overflow-x-auto rounded-xl border border-slate-200">

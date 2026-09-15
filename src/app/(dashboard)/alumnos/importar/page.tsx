@@ -11,7 +11,7 @@ export default async function ImportarAlumnosPage() {
       <Link href="/alumnos" className="mb-3 inline-flex items-center gap-1 text-sm text-slate-500">
         <ArrowLeft className="h-4 w-4" /> Volver a alumnos
       </Link>
-      <h1 className="mb-1 text-xl font-bold text-primary">Importar alumnos</h1>
+      <h1 className="mb-1 font-display text-2xl font-bold tracking-tight text-primary">Importar alumnos</h1>
       <p className="mb-5 text-sm text-slate-500">
         Subí un archivo CSV con los alumnos a cargar. Columnas obligatorias: <code className="rounded bg-slate-100 px-1">full_name</code> y{" "}
         <code className="rounded bg-slate-100 px-1">emergency_phone</code>. Opcionales: <code className="rounded bg-slate-100 px-1">dni</code>,{" "}

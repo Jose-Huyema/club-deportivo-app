@@ -31,7 +31,7 @@ export default async function AsistenciaFechaPage({
       <Link href={`/asistencia/${params.categoryId}`} className="mb-3 inline-flex items-center gap-1 text-sm text-slate-500">
         <ArrowLeft className="h-4 w-4" /> Volver al calendario
       </Link>
-      <h1 className="mb-1 text-xl font-bold text-primary">{categoryName}</h1>
+      <h1 className="mb-1 font-display text-2xl font-bold tracking-tight text-primary">{categoryName}</h1>
       <p className="mb-5 text-sm capitalize text-slate-500">{formatearFecha(params.date)}</p>
 
       {alumnos.length === 0 ? (
