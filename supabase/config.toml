@@ -1,0 +1,8 @@
+project_id = "club-deportivo-app"
+
+[db]
+port = 54322
+
+[api]
+enabled = true
+port = 54321
