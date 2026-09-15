@@ -9,8 +9,19 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        primary: "#0F172A",
-        accent: "#10B981",
+        primary: "#6E1F2E",
+        "primary-light": "#F1E1E4",
+        accent: "#6E1F2E",
+        "accent-light": "#F1E1E4",
+        success: "#1F8F5F",
+        "success-light": "#E3F3EA",
+        warn: "#A0651B",
+        "warn-light": "#FBF0DE",
+        cream: "#F6F3EF",
+      },
+      fontFamily: {
+        sans: ["var(--font-body)", "system-ui", "sans-serif"],
+        display: ["var(--font-display)", "system-ui", "sans-serif"],
       },
     },
   },
