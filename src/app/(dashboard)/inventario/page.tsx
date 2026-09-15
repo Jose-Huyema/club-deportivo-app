@@ -17,7 +17,7 @@ export default async function InventarioPage() {
     <div>
       <div className="mb-5 flex items-center justify-between gap-2">
         <div>
-          <h1 className="text-xl font-bold text-primary dark:text-white">Inventario</h1>
+          <h1 className="font-display text-2xl font-bold tracking-tight text-primary dark:text-white">Inventario</h1>
           <p className="text-sm text-slate-500 dark:text-slate-400">{items.length} artículos</p>
         </div>
         <div className="flex gap-2">

@@ -8,6 +8,7 @@ import { Card } from "@/components/ui/Card";
 import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
 import { EmptyState } from "@/components/ui/EmptyState";
+import { colorForDisciplina } from "@/lib/ui/disciplineColor";
 
 const ICONOS: Record<string, typeof CalendarCheck> = {
   asistencia: CalendarCheck,
@@ -100,7 +101,10 @@ export default async function HomePage() {
                 <div className="space-y-2">
                   {cats.map((c) => (
                     <Link key={c.id} href={`/asistencia/${c.id}`}>
-                      <Card className="flex items-center justify-between hover:shadow-md">
+                      <Card
+                        className="flex items-center justify-between rounded-l-none border-l-4 hover:shadow-md"
+                        style={{ borderLeftColor: colorForDisciplina(disciplina) }}
+                      >
                         <div>
                           <p className="font-semibold text-slate-900 dark:text-slate-100">{c.name}</p>
                           {c.schedule && <p className="text-sm text-slate-500 dark:text-slate-400">{c.schedule}</p>}
@@ -146,7 +150,9 @@ export default async function HomePage() {
         {accesos.map((a) => (
           <Link key={a.href} href={a.href}>
             <Card className="flex flex-col items-center gap-2 py-6 text-center hover:shadow-md">
-              <a.icon className="h-6 w-6 text-accent" />
+              <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary-light dark:bg-primary/20">
+                <a.icon className="h-5 w-5 text-primary dark:text-primary-light" />
+              </span>
               <span className="text-sm font-medium text-slate-900 dark:text-slate-100">{a.label}</span>
             </Card>
           </Link>

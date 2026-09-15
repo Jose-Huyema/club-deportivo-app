@@ -24,7 +24,7 @@ export default async function DocumentosAlumnoPage({ params }: { params: { stude
       <Link href="/documentos" className="mb-3 inline-flex items-center gap-1 text-sm text-slate-500">
         <ArrowLeft className="h-4 w-4" /> Volver a documentos
       </Link>
-      <h1 className="mb-5 text-xl font-bold text-primary dark:text-white">{alumno.full_name}</h1>
+      <h1 className="mb-5 font-display text-2xl font-bold tracking-tight text-primary dark:text-white">{alumno.full_name}</h1>
 
       <UploadDocumentoForm studentId={params.studentId} />
 

@@ -16,7 +16,7 @@ export default async function AsistenciaPage() {
     <div>
       <div className="mb-5 flex items-center justify-between gap-2">
         <div>
-          <h1 className="text-xl font-bold text-primary">Asistencia</h1>
+          <h1 className="font-display text-2xl font-bold tracking-tight text-primary">Asistencia</h1>
           <p className="text-sm text-slate-500">Elegí una categoría para pasar lista de hoy.</p>
         </div>
         {puedeEditar(profile.role) && (

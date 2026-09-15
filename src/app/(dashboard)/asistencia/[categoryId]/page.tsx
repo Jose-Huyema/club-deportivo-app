@@ -42,7 +42,7 @@ export default async function CalendarioAsistenciaPage({
 
   return (
     <div>
-      <h1 className="mb-1 text-xl font-bold text-primary">{categoria.name}</h1>
+      <h1 className="mb-1 font-display text-2xl font-bold tracking-tight text-primary">{categoria.name}</h1>
       <p className="mb-5 text-sm text-slate-500">Elegí un día para tomar o revisar la asistencia.</p>
 
       <div className="mb-3 flex items-center justify-between">
