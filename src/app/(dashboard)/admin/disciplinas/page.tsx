@@ -1,7 +1,7 @@
 import { requireAdmin } from "@/lib/data/profile";
 import { getDisciplinas } from "@/lib/data/admin";
-import { Card } from "@/components/ui/Card";
-import { EmptyState } from "@/components/ui/EmptyState";
+import { Card } from "@/components/ui";
+import { EmptyState } from "@/components/ui";
 import { NuevaDisciplinaForm } from "./NuevaDisciplinaForm";
 
 export default async function DisciplinasAdminPage() {
@@ -10,7 +10,7 @@ export default async function DisciplinasAdminPage() {
 
   return (
     <div>
-      <h1 className="mb-1 font-display text-2xl font-bold tracking-tight text-primary">Disciplinas</h1>
+      <h1 className="mb-1 text-xl font-bold text-primary">Disciplinas</h1>
       <p className="mb-5 text-sm text-slate-500">Deportes o actividades que ofrece el club.</p>
 
       <NuevaDisciplinaForm />

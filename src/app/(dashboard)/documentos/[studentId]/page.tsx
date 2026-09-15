@@ -3,9 +3,8 @@ import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
 import { getDocumentosDeAlumno } from "@/lib/data/documentos";
 import { createClient } from "@/lib/supabase/server";
-import { UploadDocumentoForm } from "./UploadDocumentoForm";
-import { DocumentoRow } from "./DocumentoRow";
-import { EmptyState } from "@/components/ui/EmptyState";
+import { UploadDocumentoForm, DocumentoRow } from "./DocumentosClient";
+import { EmptyState } from "@/components/ui";
 
 export default async function DocumentosAlumnoPage({ params }: { params: { studentId: string } }) {
   const supabase = createClient();
@@ -24,7 +23,7 @@ export default async function DocumentosAlumnoPage({ params }: { params: { stude
       <Link href="/documentos" className="mb-3 inline-flex items-center gap-1 text-sm text-slate-500">
         <ArrowLeft className="h-4 w-4" /> Volver a documentos
       </Link>
-      <h1 className="mb-5 font-display text-2xl font-bold tracking-tight text-primary dark:text-white">{alumno.full_name}</h1>
+      <h1 className="mb-5 text-xl font-bold text-primary dark:text-white">{alumno.full_name}</h1>
 
       <UploadDocumentoForm studentId={params.studentId} />
 

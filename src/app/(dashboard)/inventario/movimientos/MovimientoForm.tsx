@@ -2,9 +2,9 @@
 
 import { useState, FormEvent, useTransition } from "react";
 import { useRouter } from "next/navigation";
-import { Button } from "@/components/ui/Button";
-import { Card } from "@/components/ui/Card";
-import { Label, Select, Input, Textarea, ErrorText } from "@/components/ui/FormField";
+import { Button } from "@/components/ui";
+import { Card } from "@/components/ui";
+import { Label, Select, Input, Textarea, ErrorText } from "@/components/ui";
 import type { ItemInventario } from "@/lib/data/inventario";
 import { registrarMovimiento } from "./actions";
 

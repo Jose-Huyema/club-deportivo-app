@@ -15,7 +15,7 @@ export default async function EditarAlumnoPage({ params }: { params: { studentId
       <Link href={`/alumnos/${alumno.id}`} className="mb-3 inline-flex items-center gap-1 text-sm text-slate-500">
         <ArrowLeft className="h-4 w-4" /> Volver a la ficha
       </Link>
-      <h1 className="mb-5 font-display text-2xl font-bold tracking-tight text-primary dark:text-white">Editar a {alumno.full_name}</h1>
+      <h1 className="mb-5 text-xl font-bold text-primary dark:text-white">Editar a {alumno.full_name}</h1>
       <EditarAlumnoForm alumno={alumno} />
     </div>
   );

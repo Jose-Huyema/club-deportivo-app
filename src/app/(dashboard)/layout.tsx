@@ -1,5 +1,5 @@
 import { requireProfile } from "@/lib/data/profile";
-import { getAppSettings } from "@/lib/data/settings";
+import { getAppSettings } from "@/lib/data/misc";
 import { ALL_NAV_ITEMS, USUARIOS_ITEM, CONFIGURACION_ITEM } from "@/lib/nav-items";
 import { HomeNavLink, HorizontalNavLink, UsuariosNavLink, ConfiguracionNavLink } from "@/components/layout/NavLinks";
 import { SignOutButton } from "@/components/layout/SignOutButton";

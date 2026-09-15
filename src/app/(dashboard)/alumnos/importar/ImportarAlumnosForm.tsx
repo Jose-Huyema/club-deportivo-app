@@ -3,9 +3,9 @@
 import { useState, useTransition, ChangeEvent } from "react";
 import { useRouter } from "next/navigation";
 import Papa from "papaparse";
-import { Card } from "@/components/ui/Card";
-import { Button } from "@/components/ui/Button";
-import { ErrorText } from "@/components/ui/FormField";
+import { Card } from "@/components/ui";
+import { Button } from "@/components/ui";
+import { ErrorText } from "@/components/ui";
 import { importarAlumnos, type FilaImportacion } from "./actions";
 
 const COLUMNAS_ESPERADAS = ["full_name", "emergency_phone", "dni", "birth_date", "tutor_name", "medical_notes"];

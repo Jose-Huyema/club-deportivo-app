@@ -3,8 +3,8 @@ import { redirect } from "next/navigation";
 import { ArrowLeft } from "lucide-react";
 import { requireProfile } from "@/lib/data/profile";
 import { puedeRegistrarIngreso } from "@/lib/roles";
-import { getUltimosIngresos } from "@/lib/data/checkins";
-import { Card } from "@/components/ui/Card";
+import { getUltimosIngresos } from "@/lib/data/misc";
+import { Card } from "@/components/ui";
 import { ScannerClient } from "./ScannerClient";
 
 export default async function ScannerPage() {
@@ -18,7 +18,7 @@ export default async function ScannerPage() {
       <Link href="/" className="mb-3 inline-flex items-center gap-1 text-sm text-slate-500">
         <ArrowLeft className="h-4 w-4" /> Volver al inicio
       </Link>
-      <h1 className="mb-1 font-display text-2xl font-bold tracking-tight text-primary dark:text-white">Control de ingreso</h1>
+      <h1 className="mb-1 text-xl font-bold text-primary dark:text-white">Control de ingreso</h1>
       <p className="mb-5 text-sm text-slate-500 dark:text-slate-400">Escaneá el carnet del alumno para registrar su ingreso al complejo.</p>
 
       <ScannerClient />

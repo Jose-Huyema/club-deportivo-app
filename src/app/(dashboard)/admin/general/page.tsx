@@ -1,5 +1,5 @@
 import { requireAdmin } from "@/lib/data/profile";
-import { getAppSettings } from "@/lib/data/settings";
+import { getAppSettings } from "@/lib/data/misc";
 import { ConfiguracionGeneralForm } from "./ConfiguracionGeneralForm";
 
 export default async function ConfiguracionGeneralPage() {
@@ -8,7 +8,7 @@ export default async function ConfiguracionGeneralPage() {
 
   return (
     <div>
-      <h1 className="mb-1 font-display text-2xl font-bold tracking-tight text-primary">Configuración general</h1>
+      <h1 className="mb-1 text-xl font-bold text-primary">Configuración general</h1>
       <p className="mb-5 text-sm text-slate-500">
         Estos datos se muestran en la pantalla de inicio de sesión y en el resto de la app.
       </p>

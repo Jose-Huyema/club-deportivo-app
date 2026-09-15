@@ -3,11 +3,11 @@
 import { useState, FormEvent, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import clsx from "clsx";
-import { Card } from "@/components/ui/Card";
-import { Button } from "@/components/ui/Button";
-import { Label, Input, Textarea, ErrorText } from "@/components/ui/FormField";
-import { CollapsibleSection } from "@/components/ui/CollapsibleSection";
-import { StickyFormBar, FormBottomSpacer } from "@/components/ui/StickyFormBar";
+import { Card } from "@/components/ui";
+import { Button } from "@/components/ui";
+import { Label, Input, Textarea, ErrorText } from "@/components/ui";
+import { CollapsibleSection } from "@/components/ui";
+import { StickyFormBar, FormBottomSpacer } from "@/components/ui";
 import type { Categoria, Disciplina } from "@/lib/data/admin";
 import { crearAlumno } from "./actions";
 

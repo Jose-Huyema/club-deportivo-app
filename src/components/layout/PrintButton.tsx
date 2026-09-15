@@ -1,7 +1,7 @@
 "use client";
 
 import { Printer } from "lucide-react";
-import { Button } from "@/components/ui/Button";
+import { Button } from "@/components/ui";
 
 /**
  * Botón genérico de impresión. Client Component chico y sin props tipo

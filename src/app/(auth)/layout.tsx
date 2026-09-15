@@ -1,4 +1,4 @@
-import { getAppSettings } from "@/lib/data/settings";
+import { getAppSettings } from "@/lib/data/misc";
 import { LogoImage } from "@/components/layout/LogoImage";
 
 export default async function AuthLayout({ children }: { children: React.ReactNode }) {

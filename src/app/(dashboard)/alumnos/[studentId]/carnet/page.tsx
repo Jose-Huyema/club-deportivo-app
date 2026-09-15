@@ -3,7 +3,7 @@ import Link from "next/link";
 import QRCode from "qrcode";
 import { ArrowLeft } from "lucide-react";
 import { getAlumnoDetalle } from "@/lib/data/alumnos";
-import { getAppSettings } from "@/lib/data/settings";
+import { getAppSettings } from "@/lib/data/misc";
 import { PrintButton } from "@/components/layout/PrintButton";
 
 export default async function CarnetAlumnoPage({ params }: { params: { studentId: string } }) {

@@ -1,8 +1,8 @@
 "use client";
 
 import { useState, useTransition } from "react";
-import { Card } from "@/components/ui/Card";
-import { ScannerInput } from "@/components/ui/ScannerInput";
+import { Card } from "@/components/ui";
+import { ScannerInput } from "@/components/ui";
 import { registrarIngreso } from "./actions";
 
 type Feedback = { type: "success" | "error"; message: string };

@@ -4,9 +4,9 @@ import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import clsx from "clsx";
 import { Check, X, FileText, Lock, Unlock } from "lucide-react";
-import { Button } from "@/components/ui/Button";
-import { Card } from "@/components/ui/Card";
-import { Badge } from "@/components/ui/Badge";
+import { Button } from "@/components/ui";
+import { Card } from "@/components/ui";
+import { Badge } from "@/components/ui";
 import type { AlumnoParaAsistencia } from "@/lib/data/asistencia";
 import { finalizarAsistencia, reabrirAsistencia } from "./actions";
 

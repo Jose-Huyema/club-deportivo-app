@@ -2,10 +2,10 @@ import Link from "next/link";
 import { ScanLine } from "lucide-react";
 import { requireProfile, puedeEditar } from "@/lib/data/profile";
 import { getCategoriasParaAsistencia } from "@/lib/data/asistencia";
-import { Card } from "@/components/ui/Card";
-import { Badge } from "@/components/ui/Badge";
-import { Button } from "@/components/ui/Button";
-import { EmptyState } from "@/components/ui/EmptyState";
+import { Card } from "@/components/ui";
+import { Badge } from "@/components/ui";
+import { Button } from "@/components/ui";
+import { EmptyState } from "@/components/ui";
 import { ChevronRight } from "lucide-react";
 
 export default async function AsistenciaPage() {
@@ -16,7 +16,7 @@ export default async function AsistenciaPage() {
     <div>
       <div className="mb-5 flex items-center justify-between gap-2">
         <div>
-          <h1 className="font-display text-2xl font-bold tracking-tight text-primary">Asistencia</h1>
+          <h1 className="text-xl font-bold text-primary">Asistencia</h1>
           <p className="text-sm text-slate-500">Elegí una categoría para pasar lista de hoy.</p>
         </div>
         {puedeEditar(profile.role) && (

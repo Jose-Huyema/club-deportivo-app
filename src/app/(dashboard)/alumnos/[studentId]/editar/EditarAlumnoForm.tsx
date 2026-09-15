@@ -2,11 +2,11 @@
 
 import { useState, FormEvent, useTransition } from "react";
 import { useRouter } from "next/navigation";
-import { Card } from "@/components/ui/Card";
-import { Button } from "@/components/ui/Button";
-import { Label, Input, Select, Textarea, ErrorText } from "@/components/ui/FormField";
-import { CollapsibleSection } from "@/components/ui/CollapsibleSection";
-import { StickyFormBar, FormBottomSpacer } from "@/components/ui/StickyFormBar";
+import { Card } from "@/components/ui";
+import { Button } from "@/components/ui";
+import { Label, Input, Select, Textarea, ErrorText } from "@/components/ui";
+import { CollapsibleSection } from "@/components/ui";
+import { StickyFormBar, FormBottomSpacer } from "@/components/ui";
 import type { AlumnoDetalle } from "@/lib/data/alumnos";
 import { actualizarAlumno } from "./actions";
 

@@ -4,12 +4,11 @@ import { CreditCard, FileText, Pencil } from "lucide-react";
 import { getAlumnoDetalle } from "@/lib/data/alumnos";
 import { getCategorias } from "@/lib/data/admin";
 import { requireProfile, puedeEditar } from "@/lib/data/profile";
-import { Card } from "@/components/ui/Card";
-import { Badge } from "@/components/ui/Badge";
-import { Button } from "@/components/ui/Button";
-import { EmptyState } from "@/components/ui/EmptyState";
-import { ActivoToggle } from "./ActivoToggle";
-import { CategoriasEditor } from "./CategoriasEditor";
+import { Card } from "@/components/ui";
+import { Badge } from "@/components/ui";
+import { Button } from "@/components/ui";
+import { EmptyState } from "@/components/ui";
+import { ActivoToggle, CategoriasEditor } from "./AlumnoDetalleClient";
 
 const TONE_POR_ESTADO: Record<string, "success" | "danger" | "warning"> = {
   presente: "success",
@@ -31,7 +30,7 @@ export default async function AlumnoDetallePage({ params }: { params: { studentI
     <div>
       <div className="mb-4 flex items-start justify-between gap-3">
         <div>
-          <h1 className="font-display text-2xl font-bold tracking-tight text-primary dark:text-white">{alumno.full_name}</h1>
+          <h1 className="text-xl font-bold text-primary dark:text-white">{alumno.full_name}</h1>
           <p className="text-sm text-slate-500 dark:text-slate-400">
             {alumno.categorias.length > 0 ? alumno.categorias.join(", ") : "Sin categoría asignada"}
           </p>

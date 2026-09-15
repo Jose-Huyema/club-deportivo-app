@@ -13,7 +13,7 @@ export default async function NuevoArticuloPage() {
       <Link href="/inventario" className="mb-3 inline-flex items-center gap-1 text-sm text-slate-500">
         <ArrowLeft className="h-4 w-4" /> Volver a inventario
       </Link>
-      <h1 className="mb-5 font-display text-2xl font-bold tracking-tight text-primary">Nuevo artículo</h1>
+      <h1 className="mb-5 text-xl font-bold text-primary">Nuevo artículo</h1>
       <NuevoArticuloForm disciplinas={disciplinas} />
     </div>
   );

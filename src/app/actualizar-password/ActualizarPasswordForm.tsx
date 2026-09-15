@@ -3,9 +3,9 @@
 import { useState, FormEvent } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
-import { Button } from "@/components/ui/Button";
-import { Input, Label, ErrorText } from "@/components/ui/FormField";
-import { Card } from "@/components/ui/Card";
+import { Button } from "@/components/ui";
+import { Input, Label, ErrorText } from "@/components/ui";
+import { Card } from "@/components/ui";
 
 export function ActualizarPasswordForm() {
   const router = useRouter();

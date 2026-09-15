@@ -3,7 +3,7 @@ import { ArrowLeft, Download } from "lucide-react";
 import { getReporteProfesores, toCsv } from "@/lib/data/reportes";
 import { labelRol } from "@/lib/data/profile";
 import { PrintButton } from "@/components/layout/PrintButton";
-import { Badge } from "@/components/ui/Badge";
+import { Badge } from "@/components/ui";
 
 const TONE_ROL: Record<string, "success" | "warning" | "neutral"> = { admin: "success", profe: "neutral", operador: "warning" };
 
@@ -26,7 +26,7 @@ export default async function ReporteProfesoresPage() {
         </div>
       </div>
 
-      <h1 className="mb-1 font-display text-2xl font-bold tracking-tight text-primary">Reporte de profesores y usuarios</h1>
+      <h1 className="mb-1 text-xl font-bold text-primary">Reporte de profesores y usuarios</h1>
       <p className="mb-4 text-sm text-slate-500">{usuarios.length} usuarios</p>
 
       <div className="overflow-x-auto rounded-xl border border-slate-200">

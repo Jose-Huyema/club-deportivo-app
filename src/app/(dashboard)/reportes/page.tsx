@@ -2,7 +2,7 @@ import Link from "next/link";
 import { Users, CreditCard } from "lucide-react";
 import { requireProfile } from "@/lib/data/profile";
 import { redirect } from "next/navigation";
-import { Card } from "@/components/ui/Card";
+import { Card } from "@/components/ui";
 
 export default async function ReportesPage() {
   const profile = await requireProfile();
@@ -10,7 +10,7 @@ export default async function ReportesPage() {
 
   return (
     <div>
-      <h1 className="mb-1 font-display text-2xl font-bold tracking-tight text-primary">Reportes</h1>
+      <h1 className="mb-1 text-xl font-bold text-primary">Reportes</h1>
       <p className="mb-5 text-sm text-slate-500">Elegí qué querés ver, imprimir o exportar.</p>
 
       <div className="space-y-3">

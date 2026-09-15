@@ -3,9 +3,9 @@
 import { useMemo, useState } from "react";
 import Link from "next/link";
 import { Search } from "lucide-react";
-import { Card } from "@/components/ui/Card";
-import { Badge } from "@/components/ui/Badge";
-import { EmptyState } from "@/components/ui/EmptyState";
+import { Card } from "@/components/ui";
+import { Badge } from "@/components/ui";
+import { EmptyState } from "@/components/ui";
 import type { AlumnoResumen } from "@/lib/data/alumnos";
 
 export function AlumnosList({ alumnos }: { alumnos: AlumnoResumen[] }) {

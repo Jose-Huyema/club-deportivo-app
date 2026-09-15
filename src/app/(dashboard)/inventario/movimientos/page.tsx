@@ -4,8 +4,8 @@ import { ArrowLeft } from "lucide-react";
 import { requireProfile } from "@/lib/data/profile";
 import { puedeRegistrarEgreso } from "@/lib/roles";
 import { getInventario, getMovimientosRecientes, getDisciplinasDelProfe } from "@/lib/data/inventario";
-import { Card } from "@/components/ui/Card";
-import { Badge } from "@/components/ui/Badge";
+import { Card } from "@/components/ui";
+import { Badge } from "@/components/ui";
 import { MovimientoForm } from "./MovimientoForm";
 
 const TONE_POR_TIPO: Record<string, "success" | "danger" | "warning"> = {
@@ -38,7 +38,7 @@ export default async function MovimientosPage() {
       <Link href="/inventario" className="mb-3 inline-flex items-center gap-1 text-sm text-slate-500">
         <ArrowLeft className="h-4 w-4" /> Volver a inventario
       </Link>
-      <h1 className="mb-1 font-display text-2xl font-bold tracking-tight text-primary dark:text-white">
+      <h1 className="mb-1 text-xl font-bold text-primary dark:text-white">
         {soloEgresos ? "Registrar egreso o baja" : "Registrar movimiento"}
       </h1>
       {soloEgresos && (

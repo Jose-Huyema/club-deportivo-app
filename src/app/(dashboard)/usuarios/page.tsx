@@ -1,11 +1,8 @@
 import { requireAdmin } from "@/lib/data/profile";
 import { getProfesores, getCategorias } from "@/lib/data/admin";
-import { getInvitacionesPendientes } from "@/lib/data/invitaciones";
-import { EmptyState } from "@/components/ui/EmptyState";
-import { AutorizarGoogleForm } from "./AutorizarGoogleForm";
-import { PendientesGoogleList } from "./PendientesGoogleList";
-import { InvitarUsuarioForm } from "./InvitarUsuarioForm";
-import { UsuarioCard } from "./UsuarioCard";
+import { getInvitacionesPendientes } from "@/lib/data/misc";
+import { EmptyState } from "@/components/ui";
+import { AutorizarGoogleForm, PendientesGoogleList, InvitarUsuarioForm, UsuarioCard } from "./UsuariosClient";
 
 export default async function UsuariosPage() {
   await requireAdmin();
@@ -17,7 +14,7 @@ export default async function UsuariosPage() {
 
   return (
     <div>
-      <h1 className="mb-1 font-display text-2xl font-bold tracking-tight text-primary dark:text-white">Usuarios</h1>
+      <h1 className="mb-1 text-xl font-bold text-primary dark:text-white">Usuarios</h1>
       <p className="mb-5 text-sm text-slate-500 dark:text-slate-400">
         Autorizá el acceso por Gmail (recomendado) o invitá por email y contraseña.
       </p>

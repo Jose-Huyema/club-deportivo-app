@@ -2,10 +2,10 @@
 
 import { useState, FormEvent, useTransition } from "react";
 import { useRouter } from "next/navigation";
-import { Card } from "@/components/ui/Card";
-import { Button } from "@/components/ui/Button";
-import { Label, Input, ErrorText } from "@/components/ui/FormField";
-import type { AppSettings } from "@/lib/data/settings";
+import { Card } from "@/components/ui";
+import { Button } from "@/components/ui";
+import { Label, Input, ErrorText } from "@/components/ui";
+import type { AppSettings } from "@/lib/data/misc";
 import { actualizarConfiguracion } from "./actions";
 
 export function ConfiguracionGeneralForm({ settings }: { settings: AppSettings }) {
