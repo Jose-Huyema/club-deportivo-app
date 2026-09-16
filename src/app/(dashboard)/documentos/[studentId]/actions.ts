@@ -2,14 +2,14 @@
 
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
-import { assertEditorAction } from "@/lib/data/profile";
+import { assertEditorOrProfeAction } from "@/lib/data/profile";
 import { revalidatePath } from "next/cache";
 
 const TIPOS_VALIDOS = ["seguro", "foto_dni", "autorizacion", "comunicado", "otro"];
 const MAX_BYTES = 10 * 1024 * 1024; // 10 MB
 
 export async function subirDocumento(studentId: string, formData: FormData) {
-  const check = await assertEditorAction();
+  const check = await assertEditorOrProfeAction();
   if ("error" in check) return check;
 
   const file = formData.get("file") as File | null;
@@ -49,7 +49,7 @@ export async function subirDocumento(studentId: string, formData: FormData) {
 }
 
 export async function eliminarDocumento(docId: string, studentId: string, filePath: string) {
-  const check = await assertEditorAction();
+  const check = await assertEditorOrProfeAction();
   if ("error" in check) return check;
 
   const admin = createAdminClient();

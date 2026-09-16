@@ -61,6 +61,19 @@ export async function requireEditor(): Promise<Profile> {
   return profile;
 }
 
+/**
+ * Igual que requireEditor, pero también deja pasar a "profe". Se usa en
+ * acciones donde el profe SÍ debe poder operar (cerrar su propia asistencia,
+ * subir/bajar documentos de sus alumnos) — el alcance real para "profe" lo
+ * sigue acotando la política RLS correspondiente (ej. attendances_profe_scope
+ * limita a las categorías que tiene asignadas), no este chequeo.
+ */
+export async function requireEditorOrProfe(): Promise<Profile> {
+  const profile = await requireProfile();
+  if (!puedeEditar(profile.role) && profile.role !== "profe") redirect("/asistencia");
+  return profile;
+}
+
 export async function assertRoleAction(
   allowedRoles: Role[]
 ): Promise<{ userId: string; role: Role } | { error: string }> {
@@ -87,4 +100,9 @@ export async function assertAdminAction() {
 
 export async function assertEditorAction() {
   return assertRoleAction(["admin", "operador"]);
+}
+
+/** Igual que assertEditorAction, pero también deja pasar a "profe" (ver requireEditorOrProfe). */
+export async function assertEditorOrProfeAction() {
+  return assertRoleAction(["admin", "operador", "profe"]);
 }

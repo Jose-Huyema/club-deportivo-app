@@ -1,7 +1,7 @@
 "use server";
 
 import { createClient } from "@/lib/supabase/server";
-import { assertEditorAction, assertAdminAction } from "@/lib/data/profile";
+import { assertEditorOrProfeAction, assertAdminAction } from "@/lib/data/profile";
 import { revalidatePath } from "next/cache";
 
 type EstadoAlumno = { student_id: string; status: "presente" | "ausente" | "justificado" };
@@ -13,7 +13,7 @@ type EstadoAlumno = { student_id: string; status: "presente" | "ausente" | "just
  * un admin la reabra.
  */
 export async function finalizarAsistencia(categoryId: string, date: string, alumnos: EstadoAlumno[]) {
-  const check = await assertEditorAction();
+  const check = await assertEditorOrProfeAction();
   if ("error" in check) return { error: check.error };
 
   const supabase = createClient();
