@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { ArrowLeft, Download } from "lucide-react";
-import { getReporteProfesores, toCsv } from "@/lib/data/reportes";
+import { getReporteProfesores } from "@/lib/data/reportes";
 import { labelRol } from "@/lib/data/profile";
 import { PrintButton } from "@/components/layout/PrintButton";
 import { Badge } from "@/components/ui";
