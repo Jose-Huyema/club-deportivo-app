@@ -52,7 +52,7 @@ export default async function HomePage() {
   if (profile.role === "portero") {
     return (
       <div>
-        <Card className="mb-6 bg-primary text-white dark:bg-slate-950">
+        <Card className="mb-6 bg-slate-800 text-white dark:bg-slate-950">
           <p className="text-sm text-slate-300">{saludo()},</p>
           <p className="text-lg font-bold text-white">{profile.full_name}</p>
           <p className="text-sm font-medium text-white/90">{labelRol(profile.role, profile.genero)}</p>
@@ -80,7 +80,7 @@ export default async function HomePage() {
 
     return (
       <div>
-        <Card className="mb-5 bg-primary text-white dark:bg-slate-950">
+        <Card className="mb-5 bg-slate-800 text-white dark:bg-slate-950">
           <p className="text-sm text-slate-300">{saludo()},</p>
           <p className="text-lg font-bold text-white">{profile.full_name}</p>
           <p className="text-sm font-medium text-white/90">{labelRol(profile.role, profile.genero)}</p>
@@ -139,7 +139,7 @@ export default async function HomePage() {
 
   return (
     <div>
-      <Card className="mb-6 bg-primary text-white dark:bg-slate-950">
+      <Card className="mb-6 bg-slate-800 text-white dark:bg-slate-950">
         <p className="text-sm text-slate-300">{saludo()},</p>
         <p className="text-lg font-bold text-white">{profile.full_name}</p>
         <p className="text-sm font-medium text-white/90">{labelRol(profile.role, profile.genero)}</p>
