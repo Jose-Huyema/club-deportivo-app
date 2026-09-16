@@ -1,3 +1,12 @@
+
+## V0.5.2 — Asistencia rápida
+
+- Búsqueda local por nombre o DNI.
+- Marcar todos presentes / todos ausentes sin consultas a Supabase.
+- Contadores y porcentaje en tiempo real.
+- Guardado con feedback inmediato y sin `router.refresh()` después de finalizar.
+- Consultas independientes de categorías/asistencia y datos base de la toma ejecutadas en paralelo.
+
 # Club Deportivo — App
 
 Gestión de asistencia, alumnos, usuarios e inventario para el club. Next.js 14 (App Router) + Tailwind + Supabase, desplegado como PWA en Vercel.
