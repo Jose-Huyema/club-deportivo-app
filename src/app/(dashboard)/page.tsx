@@ -106,7 +106,7 @@ export default async function HomePage() {
 
     return (
       <div>
-        <div className="mb-5 rounded-xl bg-slate-800 p-6 text-white shadow">
+       <div className="mb-5 rounded-xl bg-primary p-6 text-white shadow">
   <p className="text-sm font-medium !text-white">
     {saludo()},
   </p>
@@ -115,7 +115,7 @@ export default async function HomePage() {
     {profile.full_name}
   </p>
 
-  <p className="text-sm font-medium !text-slate-200">
+  <p className="text-sm font-medium !text-white/90">
     {labelRol(profile.role, profile.genero)}
   </p>
 </div>
