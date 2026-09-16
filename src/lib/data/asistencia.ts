@@ -50,8 +50,9 @@ export async function getCategoriasParaAsistencia(
     .eq("finalized", true);
 
   const tomadasSet = new Set((yaTomadas ?? []).map((a) => a.category_id));
+  const categoriasSeguras = categorias ?? [];
 
-  return categorias.map((c: any) => ({
+  return categoriasSeguras.map((c: any) => ({
     id: c.id,
     name: c.name,
     schedule: c.schedule,
