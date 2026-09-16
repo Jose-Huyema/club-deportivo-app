@@ -1,3 +1,4 @@
+```tsx
 import Link from "next/link";
 
 import {
@@ -18,7 +19,6 @@ import { Card } from "@/components/ui";
 import { Badge } from "@/components/ui";
 import { Button } from "@/components/ui";
 import { EmptyState } from "@/components/ui";
-
 import { colorForDisciplina } from "@/lib/ui/disciplineColor";
 
 const ICONOS: Record<string, typeof CalendarCheck> = {
@@ -64,19 +64,19 @@ export default async function HomePage() {
   if (profile.role === "portero") {
     return (
       <div>
-        <Card className="mb-6 bg-slate-800 text-white dark:bg-slate-950">
-          <p className="text-sm font-medium text-white">
+        <div className="mb-6 rounded-xl bg-primary p-6 text-white shadow">
+          <p className="text-sm font-medium !text-white">
             {saludo()},
           </p>
 
-          <p className="text-lg font-bold text-white">
+          <p className="text-xl font-bold !text-white">
             {profile.full_name}
           </p>
 
-          <p className="text-sm font-medium text-slate-200">
+          <p className="text-sm font-medium !text-white/90">
             {labelRol(profile.role, profile.genero)}
           </p>
-        </Card>
+        </div>
 
         <Link href="/asistencia/scanner">
           <Button className="flex w-full flex-col items-center gap-2 py-8 text-base">
@@ -106,19 +106,19 @@ export default async function HomePage() {
 
     return (
       <div>
-       <div className="mb-5 rounded-xl bg-primary p-6 text-white shadow">
-  <p className="text-sm font-medium !text-white">
-    {saludo()},
-  </p>
+        <div className="mb-5 rounded-xl bg-primary p-6 text-white shadow">
+          <p className="text-sm font-medium !text-white">
+            {saludo()},
+          </p>
 
-  <p className="text-xl font-bold !text-white">
-    {profile.full_name}
-  </p>
+          <p className="text-xl font-bold !text-white">
+            {profile.full_name}
+          </p>
 
-  <p className="text-sm font-medium !text-white/90">
-    {labelRol(profile.role, profile.genero)}
-  </p>
-</div>
+          <p className="text-sm font-medium !text-white/90">
+            {labelRol(profile.role, profile.genero)}
+          </p>
+        </div>
 
         <h2 className="mb-3 text-sm font-semibold text-slate-700 dark:text-slate-300">
           Tus disciplinas y categorías
@@ -208,19 +208,19 @@ export default async function HomePage() {
 
   return (
     <div>
-      <Card className="mb-6 bg-slate-800 text-white dark:bg-slate-950">
-        <p className="text-sm font-medium text-white">
+      <div className="mb-6 rounded-xl bg-primary p-6 text-white shadow">
+        <p className="text-sm font-medium !text-white">
           {saludo()},
         </p>
 
-        <p className="text-lg font-bold text-white">
+        <p className="text-xl font-bold !text-white">
           {profile.full_name}
         </p>
 
-        <p className="text-sm font-medium text-slate-200">
+        <p className="text-sm font-medium !text-white/90">
           {labelRol(profile.role, profile.genero)}
         </p>
-      </Card>
+      </div>
 
       <h2 className="mb-3 text-sm font-semibold text-slate-700 dark:text-slate-300">
         Accesos directos
@@ -244,3 +244,4 @@ export default async function HomePage() {
     </div>
   );
 }
+```
