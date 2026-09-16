@@ -40,18 +40,15 @@ export async function getCategoriasParaAsistencia(
 
   if (categoryIds) query = query.in("id", categoryIds);
 
-  const { data: categorias, error } = await query;
-  if (error || !categorias) return [];
-
-  const { data: yaTomadas } = await supabase
-    .from("attendances")
-    .select("category_id")
-    .eq("date", today)
-    .eq("finalized", true);
+  // Las dos lecturas son independientes: ejecutarlas en paralelo reduce la latencia.
+  const [{ data: categorias, error }, { data: yaTomadas }] = await Promise.all([
+    query,
+    supabase.from("attendances").select("category_id").eq("date", today).eq("finalized", true),
+  ]);
 
   const tomadasSet = new Set((yaTomadas ?? []).map((a) => a.category_id));
 
-  return categorias.map((c: any) => ({
+  return categorias.map((c) => ({
     id: c.id,
     name: c.name,
     schedule: c.schedule,
@@ -83,24 +80,24 @@ export async function getAlumnosParaAsistencia(
 }> {
   const supabase = createClient();
 
-  const { data: categoria } = await supabase
-    .from("categories")
-    .select("name")
-    .eq("id", categoryId)
-    .single();
+  const [categoriaResult, inscripcionesResult, attendanceResult] = await Promise.all([
+    supabase.from("categories").select("name").eq("id", categoryId).single(),
+    supabase
+      .from("enrollments")
+      .select("student_id, students!inner(id, full_name, dni, is_active)")
+      .eq("category_id", categoryId)
+      .eq("students.is_active", true),
+    supabase
+      .from("attendances")
+      .select("id, finalized")
+      .eq("category_id", categoryId)
+      .eq("date", date)
+      .maybeSingle(),
+  ]);
 
-  const { data: inscripciones } = await supabase
-    .from("enrollments")
-    .select("student_id, students!inner(id, full_name, dni, is_active)")
-    .eq("category_id", categoryId)
-    .eq("students.is_active", true);
-
-  const { data: attendance } = await supabase
-    .from("attendances")
-    .select("id, finalized")
-    .eq("category_id", categoryId)
-    .eq("date", date)
-    .maybeSingle();
+  const categoria = categoriaResult.data;
+  const inscripciones = inscripcionesResult.data;
+  const attendance = attendanceResult.data;
 
   let detallesMap = new Map<string, "presente" | "ausente" | "justificado">();
   if (attendance) {
@@ -112,7 +109,7 @@ export async function getAlumnosParaAsistencia(
   }
 
   const alumnos: AlumnoParaAsistencia[] = (inscripciones ?? [])
-    .map((i: any) => ({
+    .map((i) => ({
       student_id: i.students.id,
       full_name: i.students.full_name,
       dni: i.students.dni,
