@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { Card } from "@/components/ui/Card";
 import { Badge } from "@/components/ui/Badge";
 import { labelRol } from "@/lib/roles";
-import type { InvitacionPendiente } from "@/lib/data/invitaciones";
+import type { InvitacionPendiente } from "@/types/invitaciones";
 import { cancelarAutorizacionPendiente } from "./actions";
 
 export function PendientesGoogleList({ pendientes }: { pendientes: InvitacionPendiente[] }) {
