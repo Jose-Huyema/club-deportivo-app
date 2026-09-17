@@ -35,3 +35,7 @@ npx supabase gen types typescript --project-id TU_PROJECT_ID > src/types/databas
 ## Íconos PWA
 
 Faltan los archivos reales en `public/icons/`: `icon-192.png` (192x192) e `icon-512.png` (512x512). Podés generarlos con cualquier herramienta online de favicon/PWA icon a partir del logo del club y subirlos directo por la interfaz web de GitHub.
+
+## V0.5.5 — Control de ingreso
+
+Se incorpora la pantalla inicial de operación rápida para portería. Esta iteración no modifica el esquema de Supabase.
