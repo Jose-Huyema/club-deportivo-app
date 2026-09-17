@@ -72,7 +72,7 @@ export function GlobalSearch() {
   }
 
   return (
-    <div className="relative mx-auto w-full max-w-5xl px-4 pb-3">
+    <div className="relative w-full min-w-0">
       <div className="relative">
         <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
         <input
@@ -93,7 +93,7 @@ export function GlobalSearch() {
       </div>
 
       {open && (results.length > 0 || message || (term.trim().length >= 2 && !isPending)) && (
-        <div className="absolute left-4 right-4 z-50 mt-2 overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-xl dark:border-slate-700 dark:bg-slate-900">
+        <div className="relative z-50 mt-2 w-full overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-xl dark:border-slate-700 dark:bg-slate-900">
           {message ? (
             <p className="p-4 text-sm text-red-600 dark:text-red-300">{message}</p>
           ) : results.length === 0 ? (
