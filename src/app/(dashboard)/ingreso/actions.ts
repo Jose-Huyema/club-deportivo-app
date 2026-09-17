@@ -40,8 +40,15 @@ export async function buscarAlumnosIngreso(term: string): Promise<{
   return { data: (data ?? []) as IngresoAlumno[], error: null };
 }
 
-export async function registrarIngresoRapido(codigo: string) {
-  const result = await registrarIngreso(codigo.includes("-") ? `STUDENT:${codigo}` : codigo);
+export async function registrarIngresoRapido(studentId: string) {
+  const result = await registrarIngreso(`STUDENT:${studentId}`);
+  revalidatePath("/ingreso");
+  revalidatePath("/asistencia/scanner");
+  return result;
+}
+
+export async function registrarIngresoPorCodigo(codigo: string) {
+  const result = await registrarIngreso(codigo.trim());
   revalidatePath("/ingreso");
   revalidatePath("/asistencia/scanner");
   return result;

@@ -21,6 +21,8 @@ export default async function ScannerPage() {
       <h1 className="mb-1 font-display text-2xl font-bold tracking-tight text-primary dark:text-white">Control de ingreso</h1>
       <p className="mb-5 text-sm text-slate-500 dark:text-slate-400">Escaneá el carnet del alumno para registrar su ingreso al complejo.</p>
 
+      <Link href="/ingreso" className="mb-4 inline-block text-sm font-semibold underline underline-offset-4">Usar búsqueda por nombre/DNI</Link>
+
       <ScannerClient />
 
       <h2 className="mb-2 mt-8 text-sm font-semibold text-slate-700 dark:text-slate-300">Últimos ingresos</h2>
