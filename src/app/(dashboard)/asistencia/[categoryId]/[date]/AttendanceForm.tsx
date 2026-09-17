@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState, useTransition } from "react";
+import { useEffect, useMemo, useState, useTransition } from "react";
 import clsx from "clsx";
 import { Check, X, FileText, Lock, Unlock, Search, Users, RotateCcw } from "lucide-react";
 import { Button, Card, Badge } from "@/components/ui";
@@ -23,6 +23,7 @@ export function AttendanceForm({ categoryId, date, alumnosIniciales, finalizadaI
   const [busqueda, setBusqueda] = useState("");
   const [isPending, startTransition] = useTransition();
   const [feedback, setFeedback] = useState<{ type: "success" | "error"; message: string } | null>(null);
+  const [dirty, setDirty] = useState(false);
 
   const filtrados = useMemo(() => {
     const q = busqueda.trim().toLocaleLowerCase();
@@ -35,10 +36,20 @@ export function AttendanceForm({ categoryId, date, alumnosIniciales, finalizadaI
   const justificados = alumnos.filter(a => a.status === "justificado").length;
   const porcentaje = alumnos.length ? Math.round((presentes / alumnos.length) * 100) : 0;
 
+  useEffect(() => {
+    if (!dirty || finalizada) return;
+    const handleBeforeUnload = (event: BeforeUnloadEvent) => {
+      event.preventDefault();
+      event.returnValue = "";
+    };
+    window.addEventListener("beforeunload", handleBeforeUnload);
+    return () => window.removeEventListener("beforeunload", handleBeforeUnload);
+  }, [dirty, finalizada]);
+
   function setTodos(status: Status) {
     if (finalizada) return;
     setFeedback(null);
-    setAlumnos(prev => prev.map(a => ({ ...a, status })));
+    setAlumnos(prev => prev.map(a => ({ ...a, status })));\n    setDirty(true);
   }
 
   function ciclarEstado(studentId: string) {
@@ -48,6 +59,7 @@ export function AttendanceForm({ categoryId, date, alumnosIniciales, finalizadaI
       if (a.student_id !== studentId) return a;
       return { ...a, status: ORDEN[(ORDEN.indexOf(a.status) + 1) % ORDEN.length] };
     }));
+    setDirty(true);
   }
 
   function guardar(finalizar: boolean) {
@@ -59,6 +71,7 @@ export function AttendanceForm({ categoryId, date, alumnosIniciales, finalizadaI
       if (result.error) setFeedback({ type: "error", message: result.error });
       else {
         if (finalizar) setFinalizada(true);
+        setDirty(false);
         setFeedback({ type: "success", message: finalizar ? "✓ Asistencia finalizada y guardada" : "✓ Asistencia guardada" });
       }
     });
@@ -70,7 +83,7 @@ export function AttendanceForm({ categoryId, date, alumnosIniciales, finalizadaI
     startTransition(async () => {
       const result = await reabrirAsistencia(attendanceId, categoryId, date);
       if (result.error) setFeedback({ type: "error", message: result.error });
-      else { setFinalizada(false); setFeedback({ type: "success", message: "✓ Asistencia reabierta" }); }
+      else { setFinalizada(false); setDirty(false); setFeedback({ type: "success", message: "✓ Asistencia reabierta" }); }
     });
   }
 
@@ -94,14 +107,21 @@ export function AttendanceForm({ categoryId, date, alumnosIniciales, finalizadaI
     </Card>
 
     {!finalizada && <>
-      <div className="mb-3 grid grid-cols-1 gap-2 sm:grid-cols-3">
-        <Button onClick={() => setTodos("presente")}><Check className="h-4 w-4" /> Todos presentes</Button>
-        <Button variant="secondary" onClick={() => setTodos("ausente")}><X className="h-4 w-4" /> Todos ausentes</Button>
-        <Button variant="secondary" onClick={() => setTodos("justificado")}><FileText className="h-4 w-4" /> Todos justificados</Button>
-      </div>
-      <div className="relative mb-4">
-        <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
-        <input value={busqueda} onChange={e => setBusqueda(e.target.value)} placeholder="Buscar alumno por nombre o DNI..." className="w-full rounded-xl border border-slate-200 bg-white py-3 pl-10 pr-4 text-sm outline-none focus:border-primary focus:ring-2 focus:ring-primary/20" />
+      <div className="sticky top-0 z-10 -mx-1 mb-4 rounded-2xl border border-slate-200 bg-white/95 p-3 shadow-sm backdrop-blur dark:border-slate-700 dark:bg-slate-900/95">
+        <div className="mb-2 grid grid-cols-1 gap-2 sm:grid-cols-3">
+          <Button onClick={() => setTodos("presente")}><Check className="h-4 w-4" /> Todos presentes</Button>
+          <Button variant="secondary" onClick={() => setTodos("ausente")}><X className="h-4 w-4" /> Todos ausentes</Button>
+          <Button variant="secondary" onClick={() => setTodos("justificado")}><FileText className="h-4 w-4" /> Todos justificados</Button>
+        </div>
+        <div className="relative">
+          <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+          <input value={busqueda} onChange={e => setBusqueda(e.target.value)} placeholder="Buscar alumno por nombre o DNI..." aria-label="Buscar alumno por nombre o DNI" className="w-full rounded-xl border border-slate-200 bg-white py-3 pl-10 pr-10 text-sm outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 dark:border-slate-700 dark:bg-slate-800" />
+          {busqueda && <button type="button" onClick={() => setBusqueda("")} aria-label="Limpiar búsqueda" className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-700">×</button>}
+        </div>
+        <div className="mt-2 text-xs text-slate-500">
+          {busqueda ? `Mostrando ${filtrados.length} de ${alumnos.length} alumnos` : `${alumnos.length} alumnos`}
+          {dirty && <span className="ml-2 font-medium text-amber-600">• cambios sin guardar</span>}
+        </div>
       </div>
     </>}
 
