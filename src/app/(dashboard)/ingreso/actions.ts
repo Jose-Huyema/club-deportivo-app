@@ -3,7 +3,7 @@
 import { createClient } from "@/lib/supabase/server";
 import { assertRoleAction } from "@/lib/data/profile";
 import { revalidatePath } from "next/cache";
-import { registrarIngreso } from "../asistencia/scanner/actions";
+import { registrarIngreso, type IngresoConfirmacion } from "../asistencia/scanner/actions";
 
 export type IngresoAlumno = {
   id: string;
@@ -40,16 +40,22 @@ export async function buscarAlumnosIngreso(term: string): Promise<{
   return { data: (data ?? []) as IngresoAlumno[], error: null };
 }
 
-export async function registrarIngresoRapido(studentId: string) {
-  const result = await registrarIngreso(`STUDENT:${studentId}`);
+export async function registrarIngresoRapido(studentId: string): Promise<{
+  error: string | null;
+  student: IngresoConfirmacion | null;
+}> {
+  const result = await registrarIngreso(`STUDENT:${studentId}`, "manual");
   revalidatePath("/ingreso");
-  revalidatePath("/asistencia/scanner");
   return result;
 }
 
-export async function registrarIngresoPorCodigo(codigo: string) {
-  const result = await registrarIngreso(codigo.trim());
+export async function registrarIngresoPorCodigo(codigo: string): Promise<{
+  error: string | null;
+  student: IngresoConfirmacion | null;
+}> {
+  const trimmed = codigo.trim();
+  const method = trimmed.startsWith("STUDENT:") ? "qr" : "dni";
+  const result = await registrarIngreso(trimmed, method);
   revalidatePath("/ingreso");
-  revalidatePath("/asistencia/scanner");
   return result;
 }
