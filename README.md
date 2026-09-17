@@ -52,3 +52,9 @@ La búsqueda y el registro de ingreso usan funciones RPC de Supabase para reduci
 ## V0.5.10 — Portero operativo
 
 El rol portero queda limitado a Control de ingreso. No muestra Alumnos, Asistencia ni otras secciones y las rutas se bloquean también por middleware.
+
+## V0.5.11 — Búsqueda global
+
+Se agrega una búsqueda global en la cabecera para usuarios con acceso a Alumnos. Permite buscar por nombre o DNI y abrir directamente el legajo existente. Portero no ve ni utiliza esta búsqueda.
+
+Aplicar la migración `017_busqueda_global_alumnos.sql`.
