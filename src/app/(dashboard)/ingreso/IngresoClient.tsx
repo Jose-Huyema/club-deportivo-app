@@ -75,6 +75,7 @@ export function IngresoClient() {
   const [confirmed, setConfirmed] = useState<IngresoConfirmacion | null>(null);
   const [isPending, startTransition] = useTransition();
   const inputRef = useRef<HTMLInputElement>(null);
+  const cacheRef = useRef<Map<string, IngresoAlumno[]>>(new Map());
 
   useEffect(() => {
     if (mode !== "buscar" || confirmed) return;
@@ -83,13 +84,22 @@ export function IngresoClient() {
       setResults([]);
       return;
     }
+    const cacheKey = value.toLocaleLowerCase();
+    const cached = cacheRef.current.get(cacheKey);
+    if (cached) {
+      setResults(cached);
+      setMessage(null);
+      return;
+    }
+
     const timer = window.setTimeout(() => {
       startTransition(async () => {
         const result = await buscarAlumnosIngreso(value);
+        cacheRef.current.set(cacheKey, result.data);
         setResults(result.data);
         if (result.error) setMessage({ ok: false, text: result.error });
       });
-    }, 180);
+    }, 260);
     return () => window.clearTimeout(timer);
   }, [term, mode, confirmed]);
 

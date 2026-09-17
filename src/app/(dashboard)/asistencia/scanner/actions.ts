@@ -1,7 +1,6 @@
 "use server";
 
 import { createClient } from "@/lib/supabase/server";
-import { assertRoleAction } from "@/lib/data/profile";
 import { revalidatePath } from "next/cache";
 
 type IngresoMethod = "qr" | "dni" | "manual";
@@ -15,59 +14,47 @@ export type IngresoConfirmacion = {
   method: IngresoMethod;
 };
 
-async function buscarAlumnoPorCodigo(codigo: string) {
-  const supabase = createClient();
-
-  const matchQr = codigo.match(/^STUDENT:(.+)$/);
-  if (matchQr) {
-    const { data } = await supabase
-      .from("students")
-      .select("id, full_name, dni, is_active, enrollments(categories(name))")
-      .eq("id", matchQr[1])
-      .maybeSingle();
-    return data ? { ...data, method: "qr" as const } : null;
+function errorIngreso(message: string) {
+  switch (message) {
+    case "NO_AUTORIZADO": return "No tenés permisos para registrar ingresos.";
+    case "CODIGO_INVALIDO": return "El código del carnet no es válido.";
+    case "ALUMNO_NO_ENCONTRADO": return "No se encontró ningún alumno con ese código.";
+    case "ALUMNO_INACTIVO": return "El alumno figura como inactivo.";
+    default: return "No se pudo registrar el ingreso. Probá de nuevo.";
   }
-
-  const normalizedDni = codigo.replace(/\D/g, "");
-  const { data } = await supabase
-    .from("students")
-    .select("id, full_name, dni, is_active, enrollments(categories(name))")
-    .eq("dni", normalizedDni || codigo.trim())
-    .maybeSingle();
-
-  return data ? { ...data, method: "dni" as const } : null;
 }
 
 export async function registrarIngreso(codigo: string, preferredMethod?: IngresoMethod) {
-  const check = await assertRoleAction(["admin", "operador", "portero"]);
-  if ("error" in check) return { error: check.error, student: null as IngresoConfirmacion | null, studentName: null as string | null };
-
-  const student = await buscarAlumnoPorCodigo(codigo);
-
-  if (!student) return { error: "No se encontró ningún alumno con ese código.", student: null, studentName: null };
-  if (!student.is_active) return { error: `${student.full_name} figura como inactivo.`, student: null, studentName: null };
-
-  const method = preferredMethod ?? student.method;
   const supabase = createClient();
-  const checkedAt = new Date().toISOString();
-  const { error: insertError } = await supabase.from("checkins").insert({
-    student_id: student.id,
-    recorded_by: check.userId,
-    method,
-    checked_in_at: checkedAt,
+  const method: IngresoMethod = preferredMethod ?? (codigo.trim().startsWith("STUDENT:") ? "qr" : "dni");
+
+  const { data, error } = await supabase.rpc("registrar_ingreso_rapido", {
+    p_code: codigo,
+    p_method: method,
   });
 
-  if (insertError) return { error: "No se pudo registrar el ingreso. Probá de nuevo.", student: null, studentName: null };
+  if (error) {
+    const raw = error.message || "";
+    const code = raw.includes("NO_AUTORIZADO") ? "NO_AUTORIZADO"
+      : raw.includes("CODIGO_INVALIDO") ? "CODIGO_INVALIDO"
+      : raw.includes("ALUMNO_NO_ENCONTRADO") ? "ALUMNO_NO_ENCONTRADO"
+      : raw.includes("ALUMNO_INACTIVO") ? "ALUMNO_INACTIVO"
+      : raw;
+    return { error: errorIngreso(code), student: null as IngresoConfirmacion | null, studentName: null as string | null };
+  }
+
+  const student = data?.[0];
+  if (!student) {
+    return { error: "No se pudo confirmar el ingreso.", student: null as IngresoConfirmacion | null, studentName: null as string | null };
+  }
 
   const confirmation: IngresoConfirmacion = {
     id: student.id,
     full_name: student.full_name,
     dni: student.dni ?? null,
-    categorias: (student.enrollments ?? [])
-      .map((e: any) => e.categories?.name)
-      .filter(Boolean),
-    checked_in_at: checkedAt,
-    method,
+    categorias: student.categorias ?? [],
+    checked_in_at: student.checked_in_at,
+    method: (student.method as IngresoMethod) ?? method,
   };
 
   revalidatePath("/ingreso");
