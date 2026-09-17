@@ -48,3 +48,7 @@ La pantalla de ingreso muestra una confirmación operativa con nombre, DNI, cate
 ## V0.5.9 — Rendimiento de ingreso
 
 La búsqueda y el registro de ingreso usan funciones RPC de Supabase para reducir viajes entre navegador, servidor y base de datos. Se agregan índices para nombre/DNI y una caché de búsqueda en la interfaz.
+
+## V0.5.10 — Portero operativo
+
+El rol portero queda limitado a Control de ingreso. No muestra Alumnos, Asistencia ni otras secciones y las rutas se bloquean también por middleware.
