@@ -1,6 +1,5 @@
 "use client";
 
-import Link from "next/link";
 import { useEffect, useRef, useState, useTransition } from "react";
 import {
   buscarAlumnosIngreso,
@@ -205,9 +204,8 @@ export function IngresoClient() {
         </div>
       )}
 
-      <div className="flex justify-center gap-4 text-sm">
-        <Link href="/alumnos" className="font-semibold underline underline-offset-4">Ver alumnos</Link>
-        <Link href="/asistencia" className="font-semibold underline underline-offset-4">Ir a asistencia</Link>
+      <div className="flex justify-center text-sm text-slate-500 dark:text-slate-400">
+        Solo disponible: Control de ingreso
       </div>
     </div>
   );

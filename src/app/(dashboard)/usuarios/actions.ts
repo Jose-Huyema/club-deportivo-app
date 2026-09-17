@@ -3,6 +3,7 @@
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { assertAdminAction } from "@/lib/data/profile";
+import { vistasPorDefecto } from "@/lib/roles";
 import { revalidatePath } from "next/cache";
 
 export async function toggleAsignacion(professorId: string, categoryId: string, asignar: boolean) {
@@ -34,7 +35,10 @@ export async function cambiarRol(userId: string, role: "admin" | "profe" | "oper
   if ("error" in check) return check;
 
   const supabase = createClient();
-  const { error } = await supabase.from("profiles").update({ role }).eq("id", userId);
+  const { error } = await supabase
+    .from("profiles")
+    .update({ role, allowed_views: vistasPorDefecto(role) })
+    .eq("id", userId);
   if (error) return { error: "No se pudo cambiar el rol." };
 
   revalidatePath("/usuarios");
@@ -168,11 +172,7 @@ export async function autorizarGoogle(
   const emailLimpio = email.trim().toLowerCase();
   if (!emailLimpio || !emailLimpio.includes("@")) return { error: "Ingresá un email válido." };
 
-  const allowedViews =
-    role === "admin" ? ["asistencia", "alumnos", "inventario", "documentos", "reportes"]
-    : role === "operador" ? ["alumnos", "documentos", "reportes"]
-    : role === "portero" ? ["ingreso"]
-    : ["asistencia", "alumnos", "inventario"];
+  const allowedViews = vistasPorDefecto(role);
 
   const supabase = createClient();
   const { error } = await supabase.from("invited_emails").upsert({
