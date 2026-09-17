@@ -1,6 +1,6 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
-import { CreditCard, FileText, Pencil } from "lucide-react";
+import { CalendarCheck2, CreditCard, FileText, LogIn, Pencil } from "lucide-react";
 import { getAlumnoDetalle } from "@/lib/data/alumnos";
 import { getCategorias } from "@/lib/data/admin";
 import { requireProfile, puedeEditar } from "@/lib/data/profile";
@@ -65,6 +65,28 @@ export default async function AlumnoDetallePage({ params }: { params: { studentI
             </Link>
           </>
         )}
+      </div>
+
+      <div className="mb-4 grid gap-3 sm:grid-cols-3">
+        <Card className="p-4">
+          <p className="text-xs font-medium uppercase tracking-wide text-slate-500 dark:text-slate-400">Categorías</p>
+          <p className="mt-1 text-2xl font-bold text-slate-900 dark:text-white">{alumno.categorias.length}</p>
+          <p className="text-xs text-slate-500 dark:text-slate-400">inscripciones activas visibles</p>
+        </Card>
+        <Card className="p-4">
+          <p className="text-xs font-medium uppercase tracking-wide text-slate-500 dark:text-slate-400">Documentos</p>
+          <p className="mt-1 text-2xl font-bold text-slate-900 dark:text-white">{alumno.documentos_cantidad}</p>
+          <p className="text-xs text-slate-500 dark:text-slate-400">archivos cargados</p>
+        </Card>
+        <Card className="p-4">
+          <p className="text-xs font-medium uppercase tracking-wide text-slate-500 dark:text-slate-400">Último ingreso</p>
+          <p className="mt-1 text-lg font-bold text-slate-900 dark:text-white">
+            {alumno.ultimos_ingresos[0]
+              ? new Date(alumno.ultimos_ingresos[0].checked_in_at).toLocaleString("es-AR", { dateStyle: "short", timeStyle: "short" })
+              : "Sin registros"}
+          </p>
+          <p className="text-xs text-slate-500 dark:text-slate-400">control de acceso</p>
+        </Card>
       </div>
 
       <Card className="mb-4 space-y-2 text-sm">
@@ -133,6 +155,37 @@ export default async function AlumnoDetallePage({ params }: { params: { studentI
           <CategoriasEditor studentId={alumno.id} categorias={categorias} categoriaIdsIniciales={alumno.categoria_ids} />
         </Card>
       )}
+
+      <div className="mb-5 grid gap-2 sm:grid-cols-3">
+        <Link href={`/documentos/${alumno.id}`} className="rounded-xl border border-slate-200 bg-white p-3 transition hover:shadow-sm dark:border-slate-700 dark:bg-slate-900">
+          <div className="flex items-center gap-2 text-sm font-semibold text-slate-800 dark:text-slate-100"><FileText className="h-4 w-4" /> Documentación</div>
+          <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">Ver y cargar archivos</p>
+        </Link>
+        <Link href="/asistencia" className="rounded-xl border border-slate-200 bg-white p-3 transition hover:shadow-sm dark:border-slate-700 dark:bg-slate-900">
+          <div className="flex items-center gap-2 text-sm font-semibold text-slate-800 dark:text-slate-100"><CalendarCheck2 className="h-4 w-4" /> Asistencia</div>
+          <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">Ir al módulo de asistencia</p>
+        </Link>
+        <Link href="/ingreso" className="rounded-xl border border-slate-200 bg-white p-3 transition hover:shadow-sm dark:border-slate-700 dark:bg-slate-900">
+          <div className="flex items-center gap-2 text-sm font-semibold text-slate-800 dark:text-slate-100"><LogIn className="h-4 w-4" /> Control de ingreso</div>
+          <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">Registrar un nuevo ingreso</p>
+        </Link>
+      </div>
+
+      <Card className="mb-5">
+        <p className="mb-3 text-sm font-semibold text-slate-700 dark:text-slate-300">Últimos ingresos</p>
+        {alumno.ultimos_ingresos.length === 0 ? (
+          <p className="text-sm text-slate-500 dark:text-slate-400">Todavía no hay registros de ingreso.</p>
+        ) : (
+          <div className="space-y-2">
+            {alumno.ultimos_ingresos.map((i, index) => (
+              <div key={`${i.checked_in_at}-${index}`} className="flex items-center justify-between rounded-lg bg-slate-50 px-3 py-2 text-sm dark:bg-slate-800">
+                <span className="font-medium text-slate-800 dark:text-slate-100">{new Date(i.checked_in_at).toLocaleString("es-AR", { dateStyle: "short", timeStyle: "short" })}</span>
+                <Badge tone="neutral">{i.method}</Badge>
+              </div>
+            ))}
+          </div>
+        )}
+      </Card>
 
       <h2 className="mb-2 text-sm font-semibold text-slate-700 dark:text-slate-300">Historial de asistencia</h2>
       {alumno.historial.length === 0 ? (
