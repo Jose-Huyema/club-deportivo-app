@@ -3,6 +3,7 @@ import { NextResponse, type NextRequest } from "next/server";
 
 const VIEW_BY_PREFIX: Record<string, string> = {
   "/asistencia/scanner": "ingreso",
+  "/ingreso": "ingreso",
   "/asistencia": "asistencia",
   "/alumnos": "alumnos",
   "/inventario": "inventario",

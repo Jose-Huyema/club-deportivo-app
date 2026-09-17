@@ -16,7 +16,7 @@ export const ALL_NAV_ITEMS: NavItem[] = [
   { key: "inventario", href: "/inventario", label: "Inventario", iconName: "inventario" },
   { key: "documentos", href: "/documentos", label: "Documentos", iconName: "documentos" },
   { key: "reportes", href: "/reportes", label: "Reportes", iconName: "reportes" },
-  { key: "ingreso", href: "/asistencia/scanner", label: "Control de ingreso", iconName: "ingreso" },
+  { key: "ingreso", href: "/ingreso", label: "Control de ingreso", iconName: "ingreso" },
 ];
 
 export const USUARIOS_ITEM = { href: "/usuarios", label: "Usuarios" };
