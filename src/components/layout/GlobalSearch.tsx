@@ -93,7 +93,7 @@ export function GlobalSearch() {
       </div>
 
       {open && (results.length > 0 || message || (term.trim().length >= 2 && !isPending)) && (
-        <div className="relative z-50 mt-2 w-full overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-xl dark:border-slate-700 dark:bg-slate-900">
+        <div className="absolute left-0 right-0 top-full z-[80] mt-2 overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-2xl ring-1 ring-black/5 dark:border-slate-700 dark:bg-slate-900 dark:ring-white/5">
           {message ? (
             <p className="p-4 text-sm text-red-600 dark:text-red-300">{message}</p>
           ) : results.length === 0 ? (
