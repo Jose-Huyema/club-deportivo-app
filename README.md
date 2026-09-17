@@ -58,3 +58,7 @@ El rol portero queda limitado a Control de ingreso. No muestra Alumnos, Asistenc
 Se agrega una búsqueda global en la cabecera para usuarios con acceso a Alumnos. Permite buscar por nombre o DNI y abrir directamente el legajo existente. Portero no ve ni utiliza esta búsqueda.
 
 Aplicar la migración `017_busqueda_global_alumnos.sql`.
+
+## V0.5.12 — Header responsive
+
+Se reorganiza el encabezado para que la búsqueda global forme parte del flujo normal del layout y sus resultados no se superpongan al saludo o la navegación.
