@@ -43,6 +43,8 @@ export type AlumnoDetalle = {
   categoria_ids: string[];
   categorias: string[];
   historial: { date: string; category_name: string; status: string }[];
+  ultimos_ingresos: { checked_in_at: string; method: string }[];
+  documentos_cantidad: number;
 };
 
 export async function getAlumnoDetalle(studentId: string): Promise<AlumnoDetalle | null> {
@@ -58,12 +60,24 @@ export async function getAlumnoDetalle(studentId: string): Promise<AlumnoDetalle
 
   if (error || !student) return null;
 
-  const { data: historialRaw } = await supabase
-    .from("attendance_details")
-    .select("status, attendances(date, categories(name))")
-    .eq("student_id", studentId)
-    .order("attendances(date)", { ascending: false })
-    .limit(20);
+  const [{ data: historialRaw }, { data: ingresosRaw }, { count: documentosCount }] = await Promise.all([
+    supabase
+      .from("attendance_details")
+      .select("status, attendances(date, categories(name))")
+      .eq("student_id", studentId)
+      .order("attendances(date)", { ascending: false })
+      .limit(20),
+    supabase
+      .from("checkins")
+      .select("checked_in_at, method")
+      .eq("student_id", studentId)
+      .order("checked_in_at", { ascending: false })
+      .limit(5),
+    supabase
+      .from("student_documents")
+      .select("id", { count: "exact", head: true })
+      .eq("student_id", studentId),
+  ]);
 
   const historial = (historialRaw ?? []).map((h: any) => ({
     date: h.attendances?.date,
@@ -88,5 +102,10 @@ export async function getAlumnoDetalle(studentId: string): Promise<AlumnoDetalle
     categoria_ids: (student.enrollments ?? []).map((e: any) => e.category_id).filter(Boolean),
     categorias: (student.enrollments ?? []).map((e: any) => e.categories?.name).filter(Boolean),
     historial,
+    ultimos_ingresos: (ingresosRaw ?? []).map((i: any) => ({
+      checked_in_at: i.checked_in_at,
+      method: i.method ?? "—",
+    })),
+    documentos_cantidad: documentosCount ?? 0,
   };
 }
