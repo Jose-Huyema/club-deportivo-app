@@ -39,3 +39,8 @@ Faltan los archivos reales en `public/icons/`: `icon-192.png` (192x192) e `icon-
 ## V0.5.5 — Control de ingreso
 
 Se incorpora la pantalla inicial de operación rápida para portería. Esta iteración no modifica el esquema de Supabase.
+
+
+## V0.5.8 — Confirmación visual de ingreso
+
+La pantalla de ingreso muestra una confirmación operativa con nombre, DNI, categorías y hora. La búsqueda manual, DNI y QR comparten el mismo registro de ingreso y almacenan el método utilizado.
