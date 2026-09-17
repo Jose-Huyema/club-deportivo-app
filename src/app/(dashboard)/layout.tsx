@@ -5,6 +5,7 @@ import { HomeNavLink, HorizontalNavLink, UsuariosNavLink, ConfiguracionNavLink }
 import { SignOutButton } from "@/components/layout/SignOutButton";
 import { ThemeToggle } from "@/components/layout/ThemeToggle";
 import { Watermark } from "@/components/layout/Watermark";
+import { GlobalSearch } from "@/components/layout/GlobalSearch";
 
 export default async function DashboardLayout({ children }: { children: React.ReactNode }) {
   const profile = await requireProfile();
@@ -41,6 +42,7 @@ export default async function DashboardLayout({ children }: { children: React.Re
             </>
           )}
         </nav>
+        {profile.role !== "portero" && profile.allowed_views.includes("alumnos") && <GlobalSearch />}
       </header>
 
       <main className="relative z-10 mx-auto max-w-4xl p-4">{children}</main>
