@@ -44,3 +44,7 @@ Se incorpora la pantalla inicial de operación rápida para portería. Esta iter
 ## V0.5.8 — Confirmación visual de ingreso
 
 La pantalla de ingreso muestra una confirmación operativa con nombre, DNI, categorías y hora. La búsqueda manual, DNI y QR comparten el mismo registro de ingreso y almacenan el método utilizado.
+
+## V0.5.9 — Rendimiento de ingreso
+
+La búsqueda y el registro de ingreso usan funciones RPC de Supabase para reducir viajes entre navegador, servidor y base de datos. Se agregan índices para nombre/DNI y una caché de búsqueda en la interfaz.
