@@ -23,7 +23,8 @@ export async function buscarAlumnosIngreso(term: string): Promise<{
   if (q.length < 2) return { data: [], error: null };
 
   const supabase = createClient();
-  const numeric = q.replace(/\D/g, "") === q;
+  const normalizedDni = q.replace(/\D/g, "");
+  const numeric = normalizedDni.length >= 3;
   const query = supabase
     .from("students")
     .select("id, full_name, dni, is_active")
@@ -32,7 +33,7 @@ export async function buscarAlumnosIngreso(term: string): Promise<{
     .limit(8);
 
   const { data, error } = numeric
-    ? await query.ilike("dni", `${q}%`)
+    ? await query.ilike("dni", `${normalizedDni}%`)
     : await query.ilike("full_name", `%${q}%`);
 
   if (error) return { data: [], error: "No se pudo realizar la búsqueda." };

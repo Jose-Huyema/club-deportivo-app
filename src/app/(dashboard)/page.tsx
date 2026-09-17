@@ -34,7 +34,7 @@ const HREFS: Record<string, string> = {
   inventario: "/inventario",
   documentos: "/documentos",
   reportes: "/reportes",
-  ingreso: "/asistencia/scanner",
+  ingreso: "/ingreso",
 };
 
 function saludo() {
@@ -57,7 +57,7 @@ export default async function HomePage() {
           <p className="text-lg font-bold">{profile.full_name}</p>
           <p className="text-sm text-slate-300">{labelRol(profile.role, profile.genero)}</p>
         </Card>
-        <Link href="/asistencia/scanner">
+        <Link href="/ingreso">
           <Button className="flex w-full flex-col items-center gap-2 py-8 text-base">
             <ScanLine className="h-8 w-8" />
             Registrar ingreso
