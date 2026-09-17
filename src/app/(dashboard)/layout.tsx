@@ -19,7 +19,7 @@ export default async function DashboardLayout({ children }: { children: React.Re
         <div className="mx-auto flex max-w-5xl items-center justify-between px-4 py-3">
           <div>
             <p className="font-bold text-white">{settings.club_name}</p>
-            <p className="text-sm font-semibold text-white">{profile.full_name}</p>
+            <p className="text-xs text-slate-400">{profile.full_name}</p>
           </div>
           <div className="flex items-center gap-1">
             <ThemeToggle />
