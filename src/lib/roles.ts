@@ -27,3 +27,10 @@ export function labelRol(role: Role, genero?: Genero): string {
   if (role === "admin") return "Admin";
   return "Operador";
 }
+export function vistasPorDefecto(role: Role): string[] {
+  if (role === "admin") return ["asistencia", "alumnos", "inventario", "documentos", "reportes"];
+  if (role === "operador") return ["alumnos", "documentos", "reportes"];
+  if (role === "portero") return ["ingreso"];
+  return ["asistencia", "alumnos", "inventario"];
+}
+

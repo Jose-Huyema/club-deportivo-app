@@ -57,6 +57,23 @@ export async function middleware(request: NextRequest) {
     const role = profile?.role;
     const allowedViews: string[] = profile?.allowed_views ?? [];
 
+    // Portero tiene una superficie operativa deliberadamente mínima: solo Control de ingreso.
+    // También redirigimos la pantalla antigua del scanner para evitar exponer rutas administrativas
+    // o de asistencia aunque el usuario escriba la URL manualmente.
+    if (role === "portero") {
+      const esIngreso = path === "/ingreso" || path.startsWith("/ingreso/");
+      if (path.startsWith("/asistencia/scanner")) {
+        const url = request.nextUrl.clone();
+        url.pathname = "/ingreso";
+        return NextResponse.redirect(url);
+      }
+      if (!esIngreso && path !== "/") {
+        const url = request.nextUrl.clone();
+        url.pathname = "/ingreso";
+        return NextResponse.redirect(url);
+      }
+    }
+
     const esRutaAdminOnly = ADMIN_ONLY_PREFIXES.some((p) => path.startsWith(p));
     if (esRutaAdminOnly && role !== "admin") {
       const url = request.nextUrl.clone();
@@ -65,7 +82,7 @@ export async function middleware(request: NextRequest) {
     }
 
     const matchedPrefix = Object.keys(VIEW_BY_PREFIX).sort((a, b) => b.length - a.length).find((p) => path.startsWith(p));
-    if (matchedPrefix && role !== "admin" && !allowedViews.includes(VIEW_BY_PREFIX[matchedPrefix])) {
+    if (matchedPrefix && role !== "admin" && role !== "portero" && !allowedViews.includes(VIEW_BY_PREFIX[matchedPrefix])) {
       const url = request.nextUrl.clone();
       url.pathname = "/";
       return NextResponse.redirect(url);
