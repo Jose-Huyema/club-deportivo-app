@@ -45,6 +45,8 @@ export type AlumnoDetalle = {
   historial: { date: string; category_name: string; status: string }[];
   ultimos_ingresos: { checked_in_at: string; method: string }[];
   documentos_cantidad: number;
+  documentos_recientes: { id: string; tipo: string; file_name: string; created_at: string }[];
+  asistencia_resumen: { total: number; presentes: number; ausentes: number; justificados: number; porcentaje: number };
 };
 
 export async function getAlumnoDetalle(studentId: string): Promise<AlumnoDetalle | null> {
@@ -60,7 +62,7 @@ export async function getAlumnoDetalle(studentId: string): Promise<AlumnoDetalle
 
   if (error || !student) return null;
 
-  const [{ data: historialRaw }, { data: ingresosRaw }, { count: documentosCount }] = await Promise.all([
+  const [{ data: historialRaw }, { data: ingresosRaw }, { data: documentosRaw, count: documentosCount }] = await Promise.all([
     supabase
       .from("attendance_details")
       .select("status, attendances(date, categories(name))")
@@ -75,14 +77,31 @@ export async function getAlumnoDetalle(studentId: string): Promise<AlumnoDetalle
       .limit(5),
     supabase
       .from("student_documents")
-      .select("id", { count: "exact", head: true })
-      .eq("student_id", studentId),
+      .select("id, tipo, file_name, created_at")
+      .eq("student_id", studentId)
+      .order("created_at", { ascending: false })
+      .limit(5),
   ]);
 
   const historial = (historialRaw ?? []).map((h: any) => ({
     date: h.attendances?.date,
     category_name: h.attendances?.categories?.name ?? "—",
     status: h.status,
+  }));
+
+  const asistenciaResumen = {
+    total: historial.length,
+    presentes: historial.filter((h) => h.status === "presente").length,
+    ausentes: historial.filter((h) => h.status === "ausente").length,
+    justificados: historial.filter((h) => h.status === "justificado").length,
+    porcentaje: historial.length > 0 ? Math.round((historial.filter((h) => h.status === "presente").length / historial.length) * 100) : 0,
+  };
+
+  const documentosRecientes = (documentosRaw ?? []).map((d: any) => ({
+    id: d.id,
+    tipo: d.tipo ?? "Documento",
+    file_name: d.file_name,
+    created_at: d.created_at,
   }));
 
   return {
@@ -106,6 +125,8 @@ export async function getAlumnoDetalle(studentId: string): Promise<AlumnoDetalle
       checked_in_at: i.checked_in_at,
       method: i.method ?? "—",
     })),
-    documentos_cantidad: documentosCount ?? 0,
+    documentos_cantidad: documentosCount ?? documentosRecientes.length,
+    documentos_recientes: documentosRecientes,
+    asistencia_resumen: asistenciaResumen,
   };
 }
