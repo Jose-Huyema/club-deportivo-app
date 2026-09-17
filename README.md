@@ -66,3 +66,9 @@ Se reorganiza el encabezado para que la búsqueda global forme parte del flujo n
 ## V0.5.14 — Legajo operativo
 
 La ficha del alumno incorpora resumen de actividad, últimos ingresos, cantidad de documentos y accesos rápidos a documentación, asistencia e ingreso.
+
+## V0.6.0 — Legajo operativo completo
+
+Se agrupa el módulo de legajo en una única experiencia de trabajo: resumen de asistencia, categorías editables, documentos recientes, últimos ingresos, historial de asistencia y acciones rápidas.
+
+No requiere migraciones nuevas de Supabase.
