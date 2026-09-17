@@ -62,3 +62,7 @@ Aplicar la migración `017_busqueda_global_alumnos.sql`.
 ## V0.5.12 — Header responsive
 
 Se reorganiza el encabezado para que la búsqueda global forme parte del flujo normal del layout y sus resultados no se superpongan al saludo o la navegación.
+
+## V0.5.14 — Legajo operativo
+
+La ficha del alumno incorpora resumen de actividad, últimos ingresos, cantidad de documentos y accesos rápidos a documentación, asistencia e ingreso.
