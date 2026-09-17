@@ -63,20 +63,11 @@ export default async function HomePage() {
   if (profile.role === "portero") {
     return (
       <div>
-        <div className="mb-6 rounded-xl bg-primary p-6 text-white shadow">
-          <p className="text-sm font-medium !text-white">
-            {saludo()},
-          </p>
-
-          <p className="text-xl font-bold !text-white">
-            {profile.full_name}
-          </p>
-
-          <p className="text-sm font-medium !text-white/90">
-            {labelRol(profile.role, profile.genero)}
-          </p>
-        </div>
-
+        <Card className="mb-6 bg-primary text-white dark:bg-slate-950">
+          <p className="text-sm text-slate-300">{saludo()},</p>
+          <p className="text-lg font-bold">{profile.full_name}</p>
+          <p className="text-sm text-slate-300">{labelRol(profile.role, profile.genero)}</p>
+        </Card>
         <Link href="/asistencia/scanner">
           <Button className="flex w-full flex-col items-center gap-2 py-8 text-base">
             <ScanLine className="h-8 w-8" />
@@ -105,10 +96,11 @@ export default async function HomePage() {
 
     return (
       <div>
-        <div className="mb-5 rounded-xl bg-primary p-6 text-white shadow">
-          <p className="text-sm font-medium !text-white">
-            {saludo()},
-          </p>
+        <Card className="mb-5 bg-primary text-white dark:bg-slate-950">
+          <p className="text-sm text-slate-300">{saludo()},</p>
+          <p className="text-lg font-bold">{profile.full_name}</p>
+          <p className="text-sm text-slate-300">{labelRol(profile.role, profile.genero)}</p>
+        </Card>
 
           <p className="text-xl font-bold !text-white">
             {profile.full_name}
@@ -207,23 +199,11 @@ export default async function HomePage() {
 
   return (
     <div>
-      <div className="mb-6 rounded-xl bg-primary p-6 text-white shadow">
-        <p className="text-sm font-medium !text-white">
-          {saludo()},
-        </p>
-
-        <p className="text-xl font-bold !text-white">
-          {profile.full_name}
-        </p>
-
-        <p className="text-sm font-medium !text-white/90">
-          {labelRol(profile.role, profile.genero)}
-        </p>
-      </div>
-
-      <h2 className="mb-3 text-sm font-semibold text-slate-700 dark:text-slate-300">
-        Accesos directos
-      </h2>
+      <Card className="mb-6 bg-primary text-white dark:bg-slate-950">
+        <p className="text-sm text-slate-300">{saludo()},</p>
+        <p className="text-lg font-bold">{profile.full_name}</p>
+        <p className="text-sm text-slate-300">{labelRol(profile.role, profile.genero)}</p>
+      </Card>
 
       <div className="grid grid-cols-2 gap-3">
         {accesos.map((a) => (
