@@ -19,17 +19,23 @@ export default async function DashboardLayout({ children }: { children: React.Re
     <div className="relative min-h-screen bg-slate-50 dark:bg-slate-900">
       <Watermark />
 
-      <header className="relative z-10 bg-primary dark:bg-slate-950">
-        <div className="mx-auto flex max-w-5xl items-center justify-between px-4 py-3">
-          <div>
-            <p className="font-bold text-white">{settings.club_name}</p>
-            <p className="text-xs text-slate-400">{profile.full_name}</p>
+      <header className="relative z-20 bg-primary dark:bg-slate-950">
+        <div className="mx-auto grid max-w-5xl gap-3 px-4 py-3 md:grid-cols-[minmax(0,1fr)_minmax(280px,420px)_auto] md:items-center">
+          <div className="min-w-0">
+            <p className="truncate font-bold text-white">{settings.club_name}</p>
+            <p className="truncate text-xs text-slate-400">{profile.full_name}</p>
           </div>
-          <div className="flex items-center gap-1">
+
+          {profile.role !== "portero" && profile.allowed_views.includes("alumnos") && (
+            <GlobalSearch />
+          )}
+
+          <div className="flex shrink-0 items-center justify-end gap-1">
             <ThemeToggle />
             <SignOutButton />
           </div>
         </div>
+
         <nav className="mx-auto flex max-w-5xl gap-1 overflow-x-auto px-4 pb-3">
           <HomeNavLink />
           {navItems.map((item) => (
@@ -42,7 +48,6 @@ export default async function DashboardLayout({ children }: { children: React.Re
             </>
           )}
         </nav>
-        {profile.role !== "portero" && profile.allowed_views.includes("alumnos") && <GlobalSearch />}
       </header>
 
       <main className="relative z-10 mx-auto max-w-4xl p-4">{children}</main>
