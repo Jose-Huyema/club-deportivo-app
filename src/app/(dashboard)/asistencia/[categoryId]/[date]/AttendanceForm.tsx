@@ -49,7 +49,8 @@ export function AttendanceForm({ categoryId, date, alumnosIniciales, finalizadaI
   function setTodos(status: Status) {
     if (finalizada) return;
     setFeedback(null);
-    setAlumnos(prev => prev.map(a => ({ ...a, status })));\n    setDirty(true);
+    setAlumnos(prev => prev.map(a => ({ ...a, status })));
+    setDirty(true);
   }
 
   function ciclarEstado(studentId: string) {
