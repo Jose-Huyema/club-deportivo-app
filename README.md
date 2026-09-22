@@ -72,3 +72,7 @@ La ficha del alumno incorpora resumen de actividad, últimos ingresos, cantidad 
 Se agrupa el módulo de legajo en una única experiencia de trabajo: resumen de asistencia, categorías editables, documentos recientes, últimos ingresos, historial de asistencia y acciones rápidas.
 
 No requiere migraciones nuevas de Supabase.
+
+## V0.7.0 — Dashboard y operación diaria
+
+Se incorpora un dashboard operativo por rol, con métricas del día, actividad reciente, alertas y accesos rápidos. No agrega migraciones nuevas.
