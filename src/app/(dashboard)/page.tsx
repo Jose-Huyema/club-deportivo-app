@@ -1,11 +1,13 @@
 import Link from "next/link";
 import {
   Activity,
+  AlertTriangle,
   BarChart3,
   CalendarCheck,
   ChevronRight,
   FileText,
   Package,
+  RefreshCw,
   ScanLine,
   Settings,
   UserCog,
@@ -16,6 +18,7 @@ import { getCategoriasParaAsistencia } from "@/lib/data/asistencia";
 import { getDashboardData } from "@/lib/data/dashboard";
 import { Card, Badge, Button, EmptyState } from "@/components/ui";
 import { colorForDisciplina } from "@/lib/ui/disciplineColor";
+import { DashboardRefreshButton } from "@/components/layout/DashboardRefreshButton";
 
 const ICONOS: Record<string, typeof CalendarCheck> = {
   asistencia: CalendarCheck,
@@ -56,6 +59,14 @@ function formatTime(value: string) {
 }
 
 function metricToneClass(tone?: "neutral" | "success" | "warning" | "danger") {
+  if (tone === "success") return "border-emerald-200 bg-emerald-50 dark:border-emerald-900 dark:bg-emerald-950/30";
+  if (tone === "warning") return "border-amber-200 bg-amber-50 dark:border-amber-900 dark:bg-amber-950/30";
+  if (tone === "danger") return "border-red-200 bg-red-50 dark:border-red-900 dark:bg-red-950/30";
+  return "border-slate-200 bg-white dark:border-slate-700 dark:bg-slate-800";
+}
+
+
+function operationToneClasses(tone: "neutral" | "success" | "warning" | "danger") {
   if (tone === "success") return "border-emerald-200 bg-emerald-50 dark:border-emerald-900 dark:bg-emerald-950/30";
   if (tone === "warning") return "border-amber-200 bg-amber-50 dark:border-amber-900 dark:bg-amber-950/30";
   if (tone === "danger") return "border-red-200 bg-red-50 dark:border-red-900 dark:bg-red-950/30";
@@ -110,6 +121,28 @@ export default async function HomePage() {
                 <Card className={`h-full ${metricToneClass(metric.tone)}`}>
                   <p className="text-xs font-medium text-slate-500 dark:text-slate-400">{metric.label}</p>
                   <p className="mt-1 text-2xl font-bold text-slate-900 dark:text-slate-100">{metric.value}</p>
+                </Card>
+              </Link>
+            ))}
+          </div>
+        </section>
+        <section>
+          <div className="mb-3 flex items-center justify-between gap-3">
+            <div>
+              <h2 className="text-sm font-semibold text-slate-700 dark:text-slate-300">Operación de hoy</h2>
+              <p className="text-xs text-slate-400">Estado de tus categorías</p>
+            </div>
+            <DashboardRefreshButton />
+          </div>
+          <div className="grid gap-3 sm:grid-cols-2">
+            {dashboard.dailyOperations.map((operation) => (
+              <Link key={operation.id} href={operation.href}>
+                <Card className={`flex items-center justify-between gap-3 hover:shadow-md ${operationToneClasses(operation.tone)}`}>
+                  <div className="min-w-0">
+                    <p className="truncate text-sm font-semibold text-slate-900 dark:text-slate-100">{operation.label}</p>
+                    <p className="text-xs text-slate-500 dark:text-slate-400">{operation.detail}</p>
+                  </div>
+                  <Badge tone={operation.tone}>{operation.value}</Badge>
                 </Card>
               </Link>
             ))}
@@ -199,9 +232,12 @@ export default async function HomePage() {
       </Card>
 
       <section>
-        <div className="mb-3 flex items-center justify-between">
-          <h2 className="text-sm font-semibold text-slate-700 dark:text-slate-300">Resumen de hoy</h2>
-          <span className="text-xs text-slate-400">Actualizado al abrir</span>
+        <div className="mb-3 flex items-center justify-between gap-3">
+          <div>
+            <h2 className="text-sm font-semibold text-slate-700 dark:text-slate-300">Resumen de hoy</h2>
+            <p className="text-xs text-slate-400">Actualizado al abrir o al pulsar actualizar</p>
+          </div>
+          <DashboardRefreshButton />
         </div>
         <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
           {dashboard.metrics.map((metric) => {
@@ -215,6 +251,28 @@ export default async function HomePage() {
           })}
         </div>
       </section>
+
+      {dashboard.dailyOperations.length > 0 && (
+        <section>
+          <div className="mb-3 flex items-center gap-2">
+            <RefreshCw className="h-4 w-4 text-slate-500" />
+            <h2 className="text-sm font-semibold text-slate-700 dark:text-slate-300">Operación de hoy</h2>
+          </div>
+          <div className="grid gap-3 sm:grid-cols-2">
+            {dashboard.dailyOperations.map((operation) => (
+              <Link key={operation.id} href={operation.href}>
+                <Card className={`flex items-center justify-between gap-3 hover:shadow-md ${operationToneClasses(operation.tone)}`}>
+                  <div className="min-w-0">
+                    <p className="truncate text-sm font-semibold text-slate-900 dark:text-slate-100">{operation.label}</p>
+                    <p className="text-xs text-slate-500 dark:text-slate-400">{operation.detail}</p>
+                  </div>
+                  <Badge tone={operation.tone}>{operation.value}</Badge>
+                </Card>
+              </Link>
+            ))}
+          </div>
+        </section>
+      )}
 
       {dashboard.alerts.length > 0 && (
         <section>
