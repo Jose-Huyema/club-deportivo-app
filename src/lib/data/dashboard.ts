@@ -18,15 +18,25 @@ export type DashboardActivity = {
 
 export type DashboardAlert = {
   label: string;
-  value: number;
+  value: number | string;
   href: string;
   tone: "warning" | "danger" | "neutral";
+};
+
+export type DashboardDailyOperation = {
+  id: string;
+  label: string;
+  detail: string;
+  value: number;
+  href: string;
+  tone: "neutral" | "success" | "warning" | "danger";
 };
 
 export type DashboardData = {
   metrics: DashboardMetric[];
   activities: DashboardActivity[];
   alerts: DashboardAlert[];
+  dailyOperations: DashboardDailyOperation[];
 };
 
 function todayIso() {
@@ -61,14 +71,36 @@ export async function getDashboardData(
         ],
         activities: [],
         alerts: [],
+        dailyOperations: [],
       };
     }
 
-    const [{ count: assignedStudents }, { count: teacherAttendances }, { data: teacherActivities }] = await Promise.all([
+    const [{ count: assignedStudents }, { count: teacherAttendances }, { data: teacherActivities }, { data: assignedCategories }, { data: todayAttendances }] = await Promise.all([
       supabase.from("enrollments").select("student_id", { count: "exact", head: true }).in("category_id", categoryIds),
       supabase.from("attendances").select("id", { count: "exact", head: true }).eq("date", today).in("category_id", categoryIds),
       supabase.from("attendances").select("id, date, finalized, categories(name)").eq("date", today).in("category_id", categoryIds).order("created_at", { ascending: false }).limit(8),
+      supabase.from("categories").select("id, name, schedule, disciplines(name)").in("id", categoryIds).order("name"),
+      supabase.from("attendances").select("category_id, finalized").eq("date", today).in("category_id", categoryIds),
     ]);
+
+    const attendanceByCategory = new Map<string, boolean>();
+    (todayAttendances ?? []).forEach((row: any) => attendanceByCategory.set(row.category_id, Boolean(row.finalized)));
+    const dailyOperations = (assignedCategories ?? []).map((category: any) => {
+      const status = attendanceByCategory.has(category.id)
+        ? attendanceByCategory.get(category.id)
+          ? { label: "Asistencia finalizada", detail: category.schedule || "Registrada hoy", tone: "success" as const }
+          : { label: "Asistencia en progreso", detail: category.schedule || "Guardada, falta finalizar", tone: "warning" as const }
+        : { label: "Asistencia pendiente", detail: category.schedule || "Todavía no registrada", tone: "danger" as const };
+
+      return {
+        id: `categoria-${category.id}`,
+        label: category.name,
+        detail: status.detail,
+        value: status.label === "Asistencia finalizada" ? "OK" : status.label === "Asistencia en progreso" ? "ABIERTO" : "PEND.",
+        href: `/asistencia/${category.id}`,
+        tone: status.tone,
+      };
+    });
 
     return {
       metrics: [
@@ -84,17 +116,35 @@ export async function getDashboardData(
         at: `${a.date}T12:00:00`,
       })),
       alerts: [],
+      dailyOperations,
     };
   }
 
-  const [{ count: activeStudents }, { count: checkinsToday }, { count: attendancesToday }, { data: recentCheckins }, { data: todayAttendances }] =
-    await Promise.all([
-      supabase.from("students").select("id", { count: "exact", head: true }).eq("is_active", true),
-      supabase.from("checkins").select("id", { count: "exact", head: true }).gte("checked_in_at", `${today}T00:00:00`).lt("checked_in_at", `${today}T23:59:59.999`),
-      supabase.from("attendances").select("id", { count: "exact", head: true }).eq("date", today),
-      supabase.from("checkins").select("id, checked_in_at, method, students(full_name)").order("checked_in_at", { ascending: false }).limit(6),
-      supabase.from("attendances").select("id, date, finalized, categories(name), profiles(full_name)").eq("date", today).order("created_at", { ascending: false }).limit(6),
-    ]);
+  const [
+    { count: activeStudents },
+    { count: checkinsToday },
+    { count: attendancesToday },
+    { data: recentCheckins },
+    { data: recentAttendances },
+    { data: allTodayAttendances },
+    { data: allCategories },
+    { data: lowStockItems },
+  ] = await Promise.all([
+    supabase.from("students").select("id", { count: "exact", head: true }).eq("is_active", true),
+    supabase.from("checkins").select("id", { count: "exact", head: true }).gte("checked_in_at", `${today}T00:00:00`).lt("checked_in_at", `${today}T23:59:59.999`),
+    supabase.from("attendances").select("id", { count: "exact", head: true }).eq("date", today),
+    supabase.from("checkins").select("id, checked_in_at, method, students(full_name)").order("checked_in_at", { ascending: false }).limit(6),
+    supabase.from("attendances").select("id, date, finalized, categories(name), profiles(full_name)").eq("date", today).order("created_at", { ascending: false }).limit(6),
+    canView(allowedViews, "asistencia")
+      ? supabase.from("attendances").select("id, category_id, date, finalized").eq("date", today)
+      : Promise.resolve({ data: [] as any[] }),
+    (canView(allowedViews, "asistencia") || role === "admin")
+      ? supabase.from("categories").select("id, name, schedule, professor_categories(id)")
+      : Promise.resolve({ data: [] as any[] }),
+    canView(allowedViews, "inventario")
+      ? supabase.from("inventory_items").select("id, name, total_quantity, min_warning_quantity").limit(250)
+      : Promise.resolve({ data: [] as any[] }),
+  ]);
 
   const activities: DashboardActivity[] = [
     ...(recentCheckins ?? []).map((c: any) => ({
@@ -104,7 +154,7 @@ export async function getDashboardData(
       detail: `Ingreso · ${String(c.method ?? "manual").toUpperCase()}`,
       at: c.checked_in_at,
     })),
-    ...(todayAttendances ?? []).map((a: any) => ({
+    ...(recentAttendances ?? []).map((a: any) => ({
       id: `asistencia-${a.id}`,
       kind: "asistencia" as const,
       title: a.categories?.name ?? "Categoría",
@@ -116,19 +166,57 @@ export async function getDashboardData(
     .slice(0, 8);
 
   const alerts: DashboardAlert[] = [];
+  const dailyOperations: DashboardDailyOperation[] = [];
 
-  if (canView(allowedViews, "inventario")) {
-    const { count } = await supabase
-      .from("inventory_items")
-      .select("id", { count: "exact", head: true })
-      .lte("total_quantity", 0);
-    if ((count ?? 0) > 0) alerts.push({ label: "Stock agotado", value: count ?? 0, href: "/inventario", tone: "danger" });
+  const attendanceCategoryIds = new Set((allTodayAttendances ?? []).map((a: any) => a.category_id));
+  const openAttendances = (allTodayAttendances ?? []).filter((a: any) => !a.finalized).length;
+  const finalizedAttendances = (allTodayAttendances ?? []).filter((a: any) => a.finalized).length;
+  const categoriesWithoutAttendance = (allCategories ?? []).filter((c: any) => !attendanceCategoryIds.has(c.id)).length;
+
+  if (canView(allowedViews, "asistencia")) {
+    if (categoriesWithoutAttendance > 0) {
+      alerts.push({ label: "Categorías sin asistencia registrada", value: categoriesWithoutAttendance, href: "/asistencia", tone: "warning" });
+    }
+    if (openAttendances > 0) {
+      alerts.push({ label: "Asistencias en progreso", value: openAttendances, href: "/asistencia", tone: "warning" });
+    }
+
+    dailyOperations.push(
+      { id: "asistencia-pendiente", label: "Sin registrar", detail: "Categorías que todavía no tienen asistencia hoy", value: categoriesWithoutAttendance, href: "/asistencia", tone: categoriesWithoutAttendance ? "danger" : "success" },
+      { id: "asistencia-abierta", label: "En progreso", detail: "Asistencias guardadas pero todavía abiertas", value: openAttendances, href: "/asistencia", tone: openAttendances ? "warning" : "success" },
+      { id: "asistencia-cerrada", label: "Finalizadas", detail: "Asistencias cerradas hoy", value: finalizedAttendances, href: "/asistencia", tone: "success" },
+    );
   }
 
-  if (role === "admin" || canView(allowedViews, "usuarios")) {
-    const { data: categories } = await supabase.from("categories").select("id, professor_categories(id)");
-    const withoutProfessor = (categories ?? []).filter((c: any) => (c.professor_categories ?? []).length === 0).length;
+  if (canView(allowedViews, "inventario")) {
+    const lowStock = lowStockItems ?? [];
+    const outOfStock = lowStock.filter((item: any) => Number(item.total_quantity) <= 0).length;
+    const warningStock = lowStock.filter((item: any) => Number(item.total_quantity) > 0 && Number(item.total_quantity) <= Number(item.min_warning_quantity ?? 5)).length;
+
+    if (outOfStock > 0) alerts.push({ label: "Stock agotado", value: outOfStock, href: "/inventario", tone: "danger" });
+    if (warningStock > 0) alerts.push({ label: "Stock bajo", value: warningStock, href: "/inventario", tone: "warning" });
+
+    dailyOperations.push({
+      id: "inventario-bajo",
+      label: "Stock bajo",
+      detail: "Artículos para revisar o reponer",
+      value: outOfStock + warningStock,
+      href: "/inventario",
+      tone: outOfStock > 0 ? "danger" : warningStock > 0 ? "warning" : "success",
+    });
+  }
+
+  if (role === "admin") {
+    const withoutProfessor = (allCategories ?? []).filter((c: any) => (c.professor_categories ?? []).length === 0).length;
     if (withoutProfessor > 0) alerts.push({ label: "Categorías sin profesor", value: withoutProfessor, href: "/usuarios", tone: "warning" });
+    dailyOperations.push({
+      id: "categorias-sin-profesor",
+      label: "Sin profesor",
+      detail: "Categorías que requieren asignación",
+      value: withoutProfessor,
+      href: "/usuarios",
+      tone: withoutProfessor ? "warning" : "success",
+    });
   }
 
   return {
@@ -139,5 +227,6 @@ export async function getDashboardData(
     ],
     activities,
     alerts,
+    dailyOperations,
   };
 }
