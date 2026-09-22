@@ -76,3 +76,12 @@ No requiere migraciones nuevas de Supabase.
 ## V0.7.0 — Dashboard y operación diaria
 
 Se incorpora un dashboard operativo por rol, con métricas del día, actividad reciente, alertas y accesos rápidos. No agrega migraciones nuevas.
+
+## V0.7.1 — Alertas y operación diaria avanzada
+
+- Centro de operación diaria en el dashboard.
+- Alertas para asistencias sin registrar, asistencias en progreso, stock agotado/bajo y categorías sin profesor.
+- Vista de estado de categorías para profesores.
+- Botón de actualización manual del dashboard sin cambiar de página.
+- Se mantienen los roles y flujos aprobados en V0.7.0.
+- No se agregan migraciones de Supabase.
