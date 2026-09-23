@@ -8,7 +8,7 @@ import { Card } from "@/components/ui/Card";
 import { Select, Input } from "@/components/ui/FormField";
 import { Button } from "@/components/ui/Button";
 import { Badge } from "@/components/ui/Badge";
-import { labelRol } from "@/lib/roles";
+import { labelRol, puedeGestionarAsistencia } from "@/lib/roles";
 import type { ProfesorConCategorias, Categoria } from "@/lib/data/admin";
 import {
   toggleAsignacion, cambiarRol, actualizarVistas, alternarHabilitado,
@@ -232,6 +232,20 @@ export function UsuarioCard({
       </div>
 
       {aviso && <p className="mb-2 text-xs font-medium text-emerald-700 dark:text-emerald-400">{aviso}</p>}
+
+      <div className="mb-3 rounded-xl border border-slate-200 bg-slate-50 p-3 dark:border-slate-700 dark:bg-slate-800/60">
+        <p className="mb-1 text-xs font-semibold uppercase tracking-wide text-slate-400">Permisos efectivos</p>
+        <div className="flex flex-wrap gap-1.5 text-xs">
+          <span className={clsx("rounded-full px-2.5 py-1", puedeGestionarAsistencia(role) && vistas.has("asistencia") ? "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-300" : "bg-slate-200 text-slate-500 dark:bg-slate-700 dark:text-slate-400")}>
+            {puedeGestionarAsistencia(role) && vistas.has("asistencia") ? (role === "profe" ? "Tomar asistencia (categorías asignadas)" : "Tomar asistencia") : "Sin permiso de asistencia"}
+          </span>
+          {role === "portero" && <span className="rounded-full bg-emerald-100 px-2.5 py-1 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-300">Solo ingreso</span>}
+          {role !== "portero" && vistas.has("alumnos") && <span className="rounded-full bg-sky-100 px-2.5 py-1 text-sky-700 dark:bg-sky-900/30 dark:text-sky-300">Alumnos</span>}
+          {role !== "portero" && vistas.has("inventario") && <span className="rounded-full bg-violet-100 px-2.5 py-1 text-violet-700 dark:bg-violet-900/30 dark:text-violet-300">Inventario</span>}
+          {role !== "portero" && vistas.has("documentos") && <span className="rounded-full bg-amber-100 px-2.5 py-1 text-amber-700 dark:bg-amber-900/30 dark:text-amber-300">Documentos</span>}
+          {role !== "portero" && vistas.has("reportes") && <span className="rounded-full bg-slate-200 px-2.5 py-1 text-slate-700 dark:bg-slate-700 dark:text-slate-200">Reportes</span>}
+        </div>
+      </div>
 
       {role !== "portero" && (
         <div className="mb-3">

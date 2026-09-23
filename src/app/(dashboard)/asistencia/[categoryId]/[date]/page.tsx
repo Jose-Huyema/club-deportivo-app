@@ -2,7 +2,7 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
 import { getAlumnosParaAsistencia } from "@/lib/data/asistencia";
-import { requireProfile } from "@/lib/data/profile";
+import { requireProfile, assertAttendanceAction } from "@/lib/data/profile";
 import { EmptyState } from "@/components/ui";
 import { AttendanceForm } from "./AttendanceForm";
 
@@ -19,6 +19,11 @@ export default async function AsistenciaFechaPage({
   params: { categoryId: string; date: string };
 }) {
   const profile = await requireProfile();
+  const permission = await assertAttendanceAction(params.categoryId);
+  if ("error" in permission) {
+    notFound();
+  }
+
   const { categoryName, attendanceId, finalized, alumnos } = await getAlumnosParaAsistencia(
     params.categoryId,
     params.date

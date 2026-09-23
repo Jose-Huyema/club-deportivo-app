@@ -1,13 +1,13 @@
 "use server";
 
 import { createClient } from "@/lib/supabase/server";
-import { assertEditorAction, assertAdminAction } from "@/lib/data/profile";
+import { assertAttendanceAction, assertAdminAction } from "@/lib/data/profile";
 import { revalidatePath } from "next/cache";
 
 type EstadoAlumno = { student_id: string; status: "presente" | "ausente" | "justificado" };
 
 async function guardarDatos(categoryId: string, date: string, alumnos: EstadoAlumno[], finalized: boolean) {
-  const check = await assertEditorAction();
+  const check = await assertAttendanceAction(categoryId);
   if ("error" in check) return { error: check.error };
 
   const supabase = createClient();

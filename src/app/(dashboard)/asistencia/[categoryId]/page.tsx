@@ -2,6 +2,7 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { getResumenMensual } from "@/lib/data/asistencia";
+import { assertAttendanceAction } from "@/lib/data/profile";
 import { createClient } from "@/lib/supabase/server";
 import { Card } from "@/components/ui";
 import clsx from "clsx";
@@ -18,6 +19,9 @@ export default async function CalendarioAsistenciaPage({
   params: { categoryId: string };
   searchParams: { year?: string; month?: string };
 }) {
+  const permission = await assertAttendanceAction(params.categoryId);
+  if ("error" in permission) notFound();
+
   const supabase = createClient();
   const { data: categoria } = await supabase
     .from("categories")

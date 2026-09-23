@@ -50,7 +50,13 @@ export async function actualizarVistas(userId: string, views: string[]) {
   if ("error" in check) return check;
 
   const supabase = createClient();
-  const { error } = await supabase.from("profiles").update({ allowed_views: views }).eq("id", userId);
+  const { data: destino } = await supabase.from("profiles").select("role").eq("id", userId).single();
+  const role = destino?.role as "admin" | "profe" | "operador" | "portero" | undefined;
+  const vistasValidas = ["asistencia", "alumnos", "inventario", "documentos", "reportes", "ingreso"];
+  const limpias = Array.from(new Set(views.filter((v) => vistasValidas.includes(v))));
+  const normalizadas = role === "portero" ? ["ingreso"] : limpias.filter((v) => v !== "ingreso");
+
+  const { error } = await supabase.from("profiles").update({ allowed_views: normalizadas }).eq("id", userId);
   if (error) return { error: "No se pudieron guardar las vistas." };
 
   revalidatePath("/usuarios");
