@@ -1,4 +1,4 @@
-export type NavIconName = "asistencia" | "alumnos" | "inventario" | "documentos" | "reportes" | "ingreso";
+export type NavIconName = "asistencia" | "alumnos" | "inventario" | "documentos" | "reportes" | "ingreso" | "cuotas";
 
 export type NavItem = {
   key: string;
@@ -17,10 +17,11 @@ export const ALL_NAV_ITEMS: NavItem[] = [
   { key: "documentos", href: "/documentos", label: "Documentos", iconName: "documentos" },
   { key: "reportes", href: "/reportes", label: "Reportes", iconName: "reportes" },
   { key: "ingreso", href: "/ingreso", label: "Control de ingreso", iconName: "ingreso" },
+  { key: "cuotas", href: "/cuotas", label: "Cuotas", iconName: "cuotas" },
 ];
 
 export const USUARIOS_ITEM = { href: "/usuarios", label: "Usuarios" };
 export const CONFIGURACION_ITEM = { href: "/admin/general", label: "Configuración" };
 
-export const ALL_VIEW_KEYS = ["asistencia", "alumnos", "inventario", "documentos", "reportes", "ingreso"] as const;
+export const ALL_VIEW_KEYS = ["asistencia", "alumnos", "inventario", "documentos", "reportes", "ingreso", "cuotas"] as const;
 export type ViewKey = (typeof ALL_VIEW_KEYS)[number];

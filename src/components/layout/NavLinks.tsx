@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import clsx from "clsx";
-import { CalendarCheck, Users, Package, FileText, BarChart3, ScanLine, UserCog, Settings, Home } from "lucide-react";
+import { CalendarCheck, Users, Package, FileText, BarChart3, ScanLine, UserCog, Settings, Home, WalletCards } from "lucide-react";
 import type { NavItem, NavIconName } from "@/lib/nav-items";
 
 const ICONS: Record<NavIconName, typeof CalendarCheck> = {
@@ -13,6 +13,7 @@ const ICONS: Record<NavIconName, typeof CalendarCheck> = {
   documentos: FileText,
   reportes: BarChart3,
   ingreso: ScanLine,
+  cuotas: WalletCards,
 };
 
 function useActivo(href: string) {

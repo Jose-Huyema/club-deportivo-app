@@ -9,6 +9,7 @@ const VIEW_BY_PREFIX: Record<string, string> = {
   "/inventario": "inventario",
   "/documentos": "documentos",
   "/reportes": "reportes",
+  "/cuotas": "cuotas",
 };
 
 const ADMIN_ONLY_PREFIXES = ["/admin", "/usuarios"];

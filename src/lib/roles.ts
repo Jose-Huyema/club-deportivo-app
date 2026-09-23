@@ -35,8 +35,8 @@ export function labelRol(role: Role, genero?: Genero): string {
   return "Operador";
 }
 export function vistasPorDefecto(role: Role): string[] {
-  if (role === "admin") return ["asistencia", "alumnos", "inventario", "documentos", "reportes"];
-  if (role === "operador") return ["alumnos", "documentos", "reportes"];
+  if (role === "admin") return ["asistencia", "alumnos", "inventario", "documentos", "reportes", "cuotas"];
+  if (role === "operador") return ["alumnos", "documentos", "reportes", "cuotas"];
   if (role === "portero") return ["ingreso"];
   return ["asistencia", "alumnos", "inventario"];
 }
