@@ -89,3 +89,14 @@ Se incorpora un dashboard operativo por rol, con métricas del día, actividad r
 
 ### Corrección V0.7.1.1
 Se ajustó el tipo de `DashboardDailyOperation.value` para permitir estados textuales y valores numéricos.
+
+
+## V0.8.0 — Usuarios y permisos
+
+- El profesor puede guardar y finalizar asistencia de sus categorías asignadas.
+- El operador solo puede gestionar asistencia si tiene la vista `asistencia` habilitada.
+- El portero nunca puede gestionar asistencia.
+- La categoría de un profesor se valida también en la acción del servidor y en RLS.
+- Una asistencia finalizada no puede ser modificada/reabierta por un no-admin.
+- La pantalla de Usuarios muestra los permisos efectivos.
+- Nueva migración: `018_permisos_asistencia_profesor.sql`.
