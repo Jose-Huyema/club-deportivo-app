@@ -5,6 +5,13 @@ export function puedeEditar(role: Role) {
   return role === "admin" || role === "operador";
 }
 
+/** Permiso operativo: puede tomar/guardar/finalizar asistencia.
+ * La categoría se valida por separado para profesores.
+ */
+export function puedeGestionarAsistencia(role: Role) {
+  return role === "admin" || role === "operador" || role === "profe";
+}
+
 /** admin/operador: acceso completo al inventario. profe: solo puede registrar egresos/bajas. */
 export function puedeRegistrarEgreso(role: Role) {
   return role === "admin" || role === "operador" || role === "profe";

@@ -88,3 +88,46 @@ export async function assertAdminAction() {
 export async function assertEditorAction() {
   return assertRoleAction(["admin", "operador"]);
 }
+
+/**
+ * Valida el permiso efectivo para operar la asistencia de una categoría.
+ * - admin: todas las categorías
+ * - operador: solo si tiene la vista asistencia habilitada
+ * - profe: solo categorías asignadas en professor_categories
+ * - portero: nunca
+ */
+export async function assertAttendanceAction(categoryId: string) {
+  const supabase = createClient();
+  const { data, error: userError } = await supabase.auth.getUser();
+
+  if (userError || !data.user) return { error: "Sesión expirada. Volvé a iniciar sesión." };
+
+  const { data: profile } = await supabase
+    .from("profiles")
+    .select("role, autorizado, allowed_views")
+    .eq("id", data.user.id)
+    .single();
+
+  if (!profile?.autorizado) return { error: "Tu cuenta no está autorizada." };
+
+  const role = profile.role as Role;
+  const views = profile.allowed_views ?? [];
+
+  if (role === "portero") return { error: "Tu rol no tiene permiso para gestionar asistencia." };
+  if (role !== "admin" && !views.includes("asistencia")) {
+    return { error: "No tenés permiso para gestionar asistencia." };
+  }
+
+  if (role === "profe") {
+    const { data: asignacion } = await supabase
+      .from("professor_categories")
+      .select("category_id")
+      .eq("professor_id", data.user.id)
+      .eq("category_id", categoryId)
+      .maybeSingle();
+
+    if (!asignacion) return { error: "No tenés asignada esta categoría." };
+  }
+
+  return { userId: data.user.id, role };
+}
