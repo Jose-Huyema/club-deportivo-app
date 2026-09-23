@@ -100,3 +100,19 @@ Se ajustó el tipo de `DashboardDailyOperation.value` para permitir estados text
 - Una asistencia finalizada no puede ser modificada/reabierta por un no-admin.
 - La pantalla de Usuarios muestra los permisos efectivos.
 - Nueva migración: `018_permisos_asistencia_profesor.sql`.
+
+
+## V0.9.0 — Cuotas y cobranzas
+
+Se incorpora un módulo administrativo preparado para el futuro del club:
+
+- Planes y membresías.
+- Plan inicial **Gratis / Comunitario** con monto $0.
+- Asignación de plan por alumno.
+- Generación manual de cuotas.
+- Registro de pagos y saldo pendiente.
+- Medios de pago: efectivo, transferencia, Mercado Pago, tarjeta y otros.
+- Control de permisos: solo admin/operador con la vista `cuotas`.
+- Resumen económico en el legajo para admin/operador.
+
+La versión no obliga a cobrar cuotas hoy: el club puede utilizar el plan gratuito y dejar el circuito de cobranzas preparado para activarlo más adelante.
