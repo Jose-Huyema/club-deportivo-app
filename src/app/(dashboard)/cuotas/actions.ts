@@ -64,7 +64,7 @@ export async function cambiarEstadoPlan(planId: string, active: boolean) {
 
 export async function buscarAlumnos(query: string) {
   const check = await assertCuotasAction();
-  if ("error" in check) return check;
+  if ("error" in check) return { error: check.error, data: [] };
 
   const q = query.trim();
   if (q.length < 2) return { error: null, data: [] };
