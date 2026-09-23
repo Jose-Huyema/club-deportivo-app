@@ -85,3 +85,7 @@ Se incorpora un dashboard operativo por rol, con métricas del día, actividad r
 - Botón de actualización manual del dashboard sin cambiar de página.
 - Se mantienen los roles y flujos aprobados en V0.7.0.
 - No se agregan migraciones de Supabase.
+
+
+### Corrección V0.7.1.1
+Se ajustó el tipo de `DashboardDailyOperation.value` para permitir estados textuales y valores numéricos.
