@@ -27,7 +27,7 @@ export type DashboardDailyOperation = {
   id: string;
   label: string;
   detail: string;
-  value: number;
+  value: number | string;
   href: string;
   tone: "neutral" | "success" | "warning" | "danger";
 };
