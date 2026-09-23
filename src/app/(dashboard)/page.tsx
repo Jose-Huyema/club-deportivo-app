@@ -12,6 +12,7 @@ import {
   Settings,
   UserCog,
   Users,
+  WalletCards,
 } from "lucide-react";
 import { requireProfile, labelRol } from "@/lib/data/profile";
 import { getCategoriasParaAsistencia } from "@/lib/data/asistencia";
@@ -27,6 +28,7 @@ const ICONOS: Record<string, typeof CalendarCheck> = {
   documentos: FileText,
   reportes: BarChart3,
   ingreso: ScanLine,
+  cuotas: WalletCards,
 };
 
 const LABELS: Record<string, string> = {
@@ -36,6 +38,7 @@ const LABELS: Record<string, string> = {
   documentos: "Documentos",
   reportes: "Reportes",
   ingreso: "Control de ingreso",
+  cuotas: "Cuotas",
 };
 
 const HREFS: Record<string, string> = {
@@ -45,6 +48,7 @@ const HREFS: Record<string, string> = {
   documentos: "/documentos",
   reportes: "/reportes",
   ingreso: "/ingreso",
+  cuotas: "/cuotas",
 };
 
 function saludo() {

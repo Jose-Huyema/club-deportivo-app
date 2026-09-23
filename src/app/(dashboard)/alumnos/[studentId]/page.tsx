@@ -3,6 +3,7 @@ import Link from "next/link";
 import { CalendarCheck2, CreditCard, FileText, LogIn, Pencil, UserRound, Paperclip, CheckCircle2 } from "lucide-react";
 import { getAlumnoDetalle } from "@/lib/data/alumnos";
 import { getCategorias } from "@/lib/data/admin";
+import { getEstadoFinancieroAlumno } from "@/lib/data/cuotas";
 import { requireProfile, puedeEditar } from "@/lib/data/profile";
 import { Card } from "@/components/ui";
 import { CollapsibleSection } from "@/components/ui/CollapsibleSection";
@@ -26,6 +27,8 @@ export default async function AlumnoDetallePage({ params }: { params: { studentI
 
   if (!alumno) notFound();
   const puedeEditarAlumno = puedeEditar(profile.role);
+  const mostrarFinanzas = profile.role === "admin" || profile.role === "operador";
+  const finanzas = mostrarFinanzas ? await getEstadoFinancieroAlumno(params.studentId) : null;
 
   return (
     <div>
@@ -44,6 +47,25 @@ export default async function AlumnoDetallePage({ params }: { params: { studentI
           !alumno.is_active && <Badge tone="neutral">Inactivo</Badge>
         )}
       </div>
+
+      {mostrarFinanzas && finanzas && (
+        <Card className="mb-4 border-accent/30 bg-accent/5 dark:bg-accent/10">
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <div>
+              <p className="text-xs font-medium uppercase tracking-wide text-slate-500 dark:text-slate-400">Plan / estado económico</p>
+              <p className="mt-1 text-lg font-bold text-slate-900 dark:text-white">{finanzas.plan?.name ?? "Sin plan asignado"}</p>
+              <p className="text-xs text-slate-500 dark:text-slate-400">{finanzas.plan?.is_free ? "Plan gratuito / comunitario" : "Gestión de cuotas habilitada"}</p>
+            </div>
+            <div className="flex items-center gap-3">
+              <div className="text-right">
+                <p className="text-xs text-slate-500 dark:text-slate-400">Saldo pendiente</p>
+                <p className="text-xl font-bold text-slate-900 dark:text-white">{new Intl.NumberFormat("es-AR", { style: "currency", currency: "ARS" }).format(finanzas.balance)}</p>
+              </div>
+              <a href="/cuotas" className="rounded-xl bg-primary px-3 py-2 text-xs font-semibold text-white hover:bg-primary/90">Gestionar</a>
+            </div>
+          </div>
+        </Card>
+      )}
 
       <div className="mb-4 grid grid-cols-2 gap-2 sm:grid-cols-4">
         <Link href={`/alumnos/${alumno.id}/carnet`}>

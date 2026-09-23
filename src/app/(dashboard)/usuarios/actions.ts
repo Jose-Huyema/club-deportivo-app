@@ -52,7 +52,7 @@ export async function actualizarVistas(userId: string, views: string[]) {
   const supabase = createClient();
   const { data: destino } = await supabase.from("profiles").select("role").eq("id", userId).single();
   const role = destino?.role as "admin" | "profe" | "operador" | "portero" | undefined;
-  const vistasValidas = ["asistencia", "alumnos", "inventario", "documentos", "reportes", "ingreso"];
+  const vistasValidas = ["asistencia", "alumnos", "inventario", "documentos", "reportes", "ingreso", "cuotas"];
   const limpias = Array.from(new Set(views.filter((v) => vistasValidas.includes(v))));
   const normalizadas = role === "portero" ? ["ingreso"] : limpias.filter((v) => v !== "ingreso");
 
